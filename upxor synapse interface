@@ -1091,124 +1091,124 @@ do -- menu
                 end);
             end
             --
-            function window:keybind_list()
-    local NKeyList = {Keybinds = {}, Visible = false}
-    UI.keybind_list = NKeyList
+	function window:keybind_list()
+		local NKeyList = {Keybinds = {}, Visible = false}
+		UI.keybind_list = NKeyList
 
-    local keybind = cloneref(Instance.new("ScreenGui", gethui()))
-    local Background = Instance.new("Frame")
-    local TopLine = Instance.new("Frame")
-    local Name_Holder = Instance.new("Frame")
-    local Name = Instance.new("TextLabel")
-    local Tab = Instance.new("Frame")
-    local UIListLayout = Instance.new("UIListLayout")
+		local keybind = cloneref(Instance.new("ScreenGui", gethui()))
+		local Background = Instance.new("Frame")
+		local TopLine = Instance.new("Frame")
+		local Name_Holder = Instance.new("Frame")
+		local Name = Instance.new("TextLabel")
+		local Tab = Instance.new("Frame")
+		local UIListLayout = Instance.new("UIListLayout")
 
-    keybind.Name = "KeyBind List"
-    keybind.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    keybind.IgnoreGuiInset = Enum.ScreenInsets.DeviceSafeInsets
-    keybind.DisplayOrder = 10
-    UI.keybind_screen_gui = keybind
+		keybind.Name = "KeyBind List"
+		keybind.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		keybind.IgnoreGuiInset = Enum.ScreenInsets.DeviceSafeInsets
+		keybind.DisplayOrder = 10
+		UI.keybind_screen_gui = keybind
 
-    Background.Name = "Background"
-    Background.BorderColor3 = Color3.fromRGB(11, 11, 11)
-    Background.BorderSizePixel = 2
-    Background.Position = UDim2.new(0.01, 0, 0.488, 0)
-    Background.Size = UDim2.new(0, 164, 0, 24)
-    Background.Visible = false
-    Background.AutomaticSize = Enum.AutomaticSize.XY
-    Background.Parent = keybind
+		Background.Name = "Background"
+		Background.BorderColor3 = Color3.fromRGB(11, 11, 11)
+		Background.BorderSizePixel = 2
+		Background.Position = UDim2.new(0.01, 0, 0.488, 0)
+		Background.Size = UDim2.new(0, 164, 0, 24)
+		Background.Visible = false
+		Background.AutomaticSize = Enum.AutomaticSize.XY
+		Background.Parent = keybind
 
-    local stroke = Instance.new("UIStroke")
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-    stroke.Color = Color3.fromRGB(71, 71, 71)
-    stroke.Thickness = 1
-    stroke.Parent = Background
+		local stroke = Instance.new("UIStroke")
+		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+		stroke.Color = Color3.fromRGB(71, 71, 71)
+		stroke.Thickness = 1
+		stroke.Parent = Background
 
-    UI:AttachTheme(Background, { BackgroundColor3 = "background" })
+		UI:AttachTheme(Background, { BackgroundColor3 = "background" })
 
-    TopLine.Name = "TopLine"
-    TopLine.BorderColor3 = Color3.fromRGB(25, 25, 25)
-    TopLine.Position = UDim2.new(0, 0, 0, 0)
-    TopLine.Size = UDim2.new(1, 0, 0, 1)
-    TopLine.Visible = true
-    TopLine.AutomaticSize = Enum.AutomaticSize.XY
-    TopLine.Parent = Background
-    UI:AttachTheme(TopLine, { BackgroundColor3 = "accent" })
+		TopLine.Name = "TopLine"
+		TopLine.BorderColor3 = Color3.fromRGB(25, 25, 25)
+		TopLine.Position = UDim2.new(0, 0, 0, 0)
+		TopLine.Size = UDim2.new(1, 0, 0, 1)
+		TopLine.Visible = true
+		TopLine.AutomaticSize = Enum.AutomaticSize.XY
+		TopLine.Parent = Background
+		UI:AttachTheme(TopLine, { BackgroundColor3 = "accent" })
 
-    Name_Holder.Name = "Name_Holder"
-    Name_Holder.BackgroundTransparency = 1
-    Name_Holder.Position = UDim2.new(0, 0, 0, 0)
-    Name_Holder.Visible = true
-    Name_Holder.Size = UDim2.new(0, 170, 0.4, 0)
-    Name_Holder.AutomaticSize = Enum.AutomaticSize.XY
-    Name_Holder.Parent = Background
+		Name_Holder.Name = "Name_Holder"
+		Name_Holder.BackgroundTransparency = 1
+		Name_Holder.Position = UDim2.new(0, 0, 0, 0)
+		Name_Holder.Visible = true
+		Name_Holder.Size = UDim2.new(0, 170, 0.4, 0)
+		Name_Holder.AutomaticSize = Enum.AutomaticSize.XY
+		Name_Holder.Parent = Background
 
-    Name.Name = "Name_List"
-    Name.Parent = Name_Holder
-    Name.BackgroundTransparency = 1
-    Name.BorderColor3 = Color3.fromRGB(25, 25, 25)
-    Name.BorderSizePixel = 0
-    Name.Size = UDim2.new(1, 0, 0, 25)
-    Name.FontFace = UI.font
-    Name.Text = "KeyBind List"
-    Name.TextStrokeTransparency = 0
-    Name.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Name.TextSize = UI.font_size
-    Name.RichText = true
+		Name.Name = "Name_List"
+		Name.Parent = Name_Holder
+		Name.BackgroundTransparency = 1
+		Name.BorderColor3 = Color3.fromRGB(25, 25, 25)
+		Name.BorderSizePixel = 0
+		Name.Size = UDim2.new(1, 0, 0, 25)
+		Name.FontFace = UI.font
+		Name.Text = "KeyBind List"
+		Name.TextStrokeTransparency = 0
+		Name.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Name.TextSize = UI.font_size
+		Name.RichText = true
 
-    Tab.Name = "Tab"
-    Tab.Visible = true
-    Tab.Parent = Background
-    Tab.BackgroundTransparency = 1.000
-    Tab.BorderColor3 = Color3.fromRGB(25, 25, 25)
-    Tab.Position = UDim2.new(0, 0, 0, 25)
-    Tab.Size = UDim2.new(1, 0, 0, -20)
-    Tab.AutomaticSize = Enum.AutomaticSize.Y
+		Tab.Name = "Tab"
+		Tab.Visible = true
+		Tab.Parent = Background
+		Tab.BackgroundTransparency = 1.000
+		Tab.BorderColor3 = Color3.fromRGB(25, 25, 25)
+		Tab.Position = UDim2.new(0, 0, 0, 25)
+		Tab.Size = UDim2.new(1, 0, 0, -20)
+		Tab.AutomaticSize = Enum.AutomaticSize.Y
 
-    UI:AttachTheme(Tab, { BackgroundColor3 = "background" })
+		UI:AttachTheme(Tab, { BackgroundColor3 = "background" })
 
-    UIListLayout.Parent = Tab
-    UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Padding = UDim.new(0, 5)
+		UIListLayout.Parent = Tab
+		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		UIListLayout.Padding = UDim.new(0, 5)
 
-    function NKeyList:SetVisible(State)
-        NKeyList.Visible = State
-        Background.Visible = State
-    end
+		function NKeyList:SetVisible(State)
+			NKeyList.Visible = State
+			Background.Visible = State
+		end
 
-    function NKeyList:NewKey(Key, Name)
-        local KName = Instance.new("TextLabel")
-        local KeyValue = {}
+		function NKeyList:NewKey(Key, Name)
+			local KName = Instance.new("TextLabel")
+			local KeyValue = {}
 
-        KName.Name = "Name"
-        KName.Parent = Tab
-        KName.AnchorPoint = Vector2.new(0.5, 0.5)
-        KName.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
-        KName.BackgroundTransparency = 1
-        KName.BorderColor3 = Color3.fromRGB(25, 25, 25)
-        KName.BorderSizePixel = 0
-        KName.Position = UDim2.new(0.5, 0, -1.85000002, 0)
-        KName.Size = UDim2.new(0, 0, 0, 0)
-        KName.FontFace = UI.font
-        KName.TextColor3 = Color3.fromRGB(255, 255, 255)
-        KName.TextSize = UI.font_size
-        KName.AutomaticSize = Enum.AutomaticSize.XY
+			KName.Name = "Name"
+			KName.Parent = Tab
+			KName.AnchorPoint = Vector2.new(0.5, 0.5)
+			KName.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
+			KName.BackgroundTransparency = 1
+			KName.BorderColor3 = Color3.fromRGB(25, 25, 25)
+			KName.BorderSizePixel = 0
+			KName.Position = UDim2.new(0.5, 0, -1.85000002, 0)
+			KName.Size = UDim2.new(0, 0, 0, 0)
+			KName.FontFace = UI.font
+			KName.TextColor3 = Color3.fromRGB(255, 255, 255)
+			KName.TextSize = UI.font_size
+			KName.AutomaticSize = Enum.AutomaticSize.XY
 
-        function KeyValue:SetVisible(State)
-            KName.Visible = State
-        end
+			function KeyValue:SetVisible(State)
+				KName.Visible = State
+			end
 
-        function KeyValue:Update(NKey, NewName)
-            KName.Text = string.format("%s: [%s]", NewName, tostring(NKey))
-        end
+			function KeyValue:Update(NKey, NewName)
+				KName.Text = string.format("%s: [%s]", NewName, tostring(NKey))
+			end
 
-        return KeyValue
-    end
-    
-    return NKeyList
-end
-window:keybind_list()
+			return KeyValue
+		end
+		
+		return NKeyList
+	end
+	window:keybind_list()
         function UI:tabs(properties)
             if not properties then properties = {} end;
             --
