@@ -70,7 +70,7 @@ function Fun.Create(title)
     Shadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Shadow.BackgroundTransparency = 1.000
     Shadow.Position = UDim2.new(0.349795759, 0, 0.171759665, 0)
-    Shadow.Size = UDim2.new(0, 525, 0, 468)
+    Shadow.Size = UDim2.new(0, 820, 0, 520)
     Shadow.Image = "http://www.roblox.com/asset/?id=6105530152"
     Shadow.ImageColor3 = Color3.fromRGB(18, 18, 18)
 
@@ -78,7 +78,7 @@ function Fun.Create(title)
     mainFrame.Parent = Shadow
     mainFrame.BackgroundColor3 = Color3.fromRGB(47, 47, 56)
     mainFrame.Position = UDim2.new(0.0500000007, 0, 0.0780000016, 0)
-    mainFrame.Size = UDim2.new(0, 475, 0, 396)
+    mainFrame.Size = UDim2.new(0, 770, 0, 430)
 
     mainCorner.CornerRadius = UDim.new(0, 0)
     mainCorner.Name = "mainCorner"
@@ -87,7 +87,7 @@ function Fun.Create(title)
     mainSide.Name = "mainSide"
     mainSide.Parent = mainFrame
     mainSide.BackgroundColor3 = Color3.fromRGB(37, 37, 44)
-    mainSide.Size = UDim2.new(0, 166, 0, 396)
+    mainSide.Size = UDim2.new(0, 200, 0, 430)
 
     UICorner.CornerRadius = UDim.new(0, 6)
     UICorner.Parent = mainSide
@@ -134,14 +134,14 @@ function Fun.Create(title)
     cover.BackgroundColor3 = Color3.fromRGB(37, 37, 44)
     cover.BorderSizePixel = 0
     cover.Position = UDim2.new(0.949999988, 0, 0, 0)
-    cover.Size = UDim2.new(0, 9, 0, 396)
+    cover.Size = UDim2.new(0, 9, 0, 430)
 
     allTabs.Name = "allTabs"
     allTabs.Parent = mainSide
     allTabs.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     allTabs.BackgroundTransparency = 1.000
     allTabs.Position = UDim2.new(0.0499999262, 0, 0.108294941, 0)
-    allTabs.Size = UDim2.new(0, 149, 0, 344)
+    allTabs.Size = UDim2.new(0, 180, 0, 380)
 
     tabList.Name = "tabList"
     tabList.Parent = allTabs
@@ -151,8 +151,8 @@ function Fun.Create(title)
     allPages.Parent = mainFrame
     allPages.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     allPages.BackgroundTransparency = 1.000
-    allPages.Position = UDim2.new(0.366315782, 0, 0.017676767, 0)
-    allPages.Size = UDim2.new(0, 295, 0, 381)
+    allPages.Position = UDim2.new(0.275, 0, 0.02, 0)
+    allPages.Size = UDim2.new(0, 555, 0, 400)
 
     pages.Name = "pages"
     pages.Parent = allPages
@@ -186,33 +186,36 @@ function Fun.Create(title)
         newPage.ScrollBarImageColor3 = Color3.fromRGB(127, 97, 145)
         newPage.Visible = false
 
-        local sectionListing = Instance.new("UIGridLayout")    
-        sectionListing.Name = "sectionListing"
-        sectionListing.Parent = newPage
-        sectionListing.SortOrder = Enum.SortOrder.LayoutOrder
-        sectionListing.CellPadding = UDim2.new(0, 5, 0, 3)
-        sectionListing.CellSize = UDim2.new(0.475, 0, 0, 36)
-        sectionListing.HorizontalAlignment = Enum.HorizontalAlignment.Left
-        sectionListing.VerticalAlignment = Enum.VerticalAlignment.Top
-        sectionListing.FillDirection = Enum.FillDirection.Horizontal
-        sectionListing.StartCorner = Enum.StartCorner.TopLeft
+        local leftColumn = Instance.new("Frame")
+        leftColumn.Name = "leftColumn"
+        leftColumn.Parent = newPage
+        leftColumn.BackgroundTransparency = 1
+        leftColumn.Size = UDim2.new(0.49, -5, 1, 0)
+        leftColumn.Position = UDim2.new(0, 0, 0, 0)
+
+        local rightColumn = Instance.new("Frame")
+        rightColumn.Name = "rightColumn"
+        rightColumn.Parent = newPage
+        rightColumn.BackgroundTransparency = 1
+        rightColumn.Size = UDim2.new(0.49, -5, 1, 0)
+        rightColumn.Position = UDim2.new(0.51, 5, 0, 0)
+
+        local leftList = Instance.new("UIListLayout")
+        leftList.Parent = leftColumn
+        leftList.SortOrder = Enum.SortOrder.LayoutOrder
+        leftList.Padding = UDim.new(0, 6)
+
+        local rightList = Instance.new("UIListLayout")
+        rightList.Parent = rightColumn
+        rightList.SortOrder = Enum.SortOrder.LayoutOrder
+        rightList.Padding = UDim.new(0, 6)
                 
         local function UpdateSize()
-            local maxY = 0
-            for _, child in pairs(newPage:GetChildren()) do
-                if child:IsA("Frame") and child.Name == "sectionFrame" then
-                    local absoluteSize = child.AbsoluteSize
-                    local absolutePosition = child.AbsolutePosition
-                    local bottomY = absolutePosition.Y + absoluteSize.Y
-                    if bottomY > maxY then
-                        maxY = bottomY
-                    end
-                end
-            end
-            maxY = math.max(maxY, sectionListing.AbsoluteContentSize.Y)
-            
+            local leftH = leftList.AbsoluteContentSize.Y
+            local rightH = rightList.AbsoluteContentSize.Y
+            local maxH = math.max(leftH, rightH)
             game.TweenService:Create(newPage, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
-                CanvasSize = UDim2.new(0, newPage.AbsoluteSize.X, 0, maxY + 10)
+                CanvasSize = UDim2.new(0, 0, 0, maxH + 20)
             }):Play()
         end
         UpdateSize()
@@ -260,39 +263,21 @@ function Fun.Create(title)
             local sectionCircle = Instance.new("Frame")
             local UICorner_3 = Instance.new("UICorner")
             local TextLabel = Instance.new("TextLabel")
-            local closeSection = Instance.new("ImageButton")
 
             sectionFrame.Name = "sectionFrame"
-            sectionFrame.Parent = newPage
+            -- place into left/right column based on position
+            if position == "2" then
+                sectionFrame.Parent = rightColumn
+            else
+                sectionFrame.Parent = leftColumn
+            end
             sectionFrame.BackgroundColor3 = Color3.fromRGB(37, 37, 44)
             sectionFrame.Position = UDim2.new(0, 0, 0, 0)
-            if position == "2" then
-                sectionFrame.Size = UDim2.new(0.475, 0, 0, 36)
-            elseif position == "1" then
-                sectionFrame.Size = UDim2.new(0.475, 0, 0, 36)
-            else
-                sectionFrame.Size = UDim2.new(0.9559322, 0, 0, 36)
-            end
-            sectionFrame.ClipsDescendants = true
+            sectionFrame.Size = UDim2.new(1, 0, 0, 36)
+            sectionFrame.AutomaticSize = Enum.AutomaticSize.Y
+            sectionFrame.ClipsDescendants = false
             
-            -- Set LayoutOrder based on position for proper grid placement
-            -- Position "1" and "2" should be on same row, so use sequential LayoutOrder
-            if position == "2" then
-                -- For position "2", place it next to the last "1" section
-                if lastPosition1Order then
-                    sectionFrame.LayoutOrder = lastPosition1Order + 1
-                    lastPosition1Order = nil -- Reset after pairing
-                else
-                    sectionCounter = sectionCounter + 1
-                    sectionFrame.LayoutOrder = sectionCounter
-                end
-            else
-                sectionCounter = sectionCounter + 1
-                sectionFrame.LayoutOrder = sectionCounter
-                if position == "1" then
-                    lastPosition1Order = sectionCounter -- Track for potential "2" pairing
-                end
-            end
+            -- Let list layouts manage order naturally within columns
             sectionFrame:SetAttribute("SectionPosition", position)
 
             UICorner.Parent = sectionFrame
@@ -330,53 +315,7 @@ function Fun.Create(title)
             TextLabel.TextSize = 14.000
             TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-            
-
-            closeSection.Name = "closeSection"
-            closeSection.Parent = sectionFrameHead
-            closeSection.BackgroundTransparency = 1.000
-            closeSection.Position = UDim2.new(0.889999986, 0, 0.155000001, 0)
-            closeSection.Size = UDim2.new(0, 25, 0, 25)
-            closeSection.ZIndex = 2
-            closeSection.Image = "rbxassetid://3926305904"
-            closeSection.ImageColor3 = Color3.fromRGB(82, 82, 98)
-            closeSection.ImageRectOffset = Vector2.new(404, 284)
-            closeSection.ImageRectSize = Vector2.new(36, 36)
-            local sectionWidth = (position == "1" or position == "2") and 0.475 or 0.956
-            
-            closeSection.MouseButton1Click:Connect(function()
-                if isDropped then
-                    isDropped = false
-                    sectionFrame:TweenSize(UDim2.new(sectionWidth, 0,0, 36), "In", "Linear", 0.10)
-                    game.TweenService:Create(closeSection, TweenInfo.new(0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{
-                        Rotation = 0,
-                        ImageColor3 = Color3.fromRGB(82, 82, 98)
-                    }):Play()
-                    game.TweenService:Create(sectionCircle, TweenInfo.new(0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{
-                        BackgroundColor3 = Color3.fromRGB(82, 82, 98)
-                    }):Play()
-                    game.TweenService:Create(TextLabel, TweenInfo.new(0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{
-                        TextColor3 = Color3.fromRGB(82, 82, 98)
-                    }):Play()
-                    wait(0.10)
-                    UpdateSize()
-                else
-                    isDropped = true
-                    sectionFrame:TweenSize(UDim2.new(sectionWidth, 0, 0, sectionListLayout.AbsoluteContentSize.Y + 8), "In", "Linear", 0.10)
-                    game.TweenService:Create(closeSection, TweenInfo.new(0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{
-                        Rotation = 180,
-                        ImageColor3 = Color3.fromRGB(127, 97, 145)
-                    }):Play()
-                    game.TweenService:Create(sectionCircle, TweenInfo.new(0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{
-                        BackgroundColor3 = Color3.fromRGB(127, 97, 145)
-                    }):Play()
-                    game.TweenService:Create(TextLabel, TweenInfo.new(0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.In),{
-                        TextColor3 = Color3.fromRGB(127, 97, 145)
-                    }):Play()
-                    wait(0.10)
-                    UpdateSize()
-                end
-            end)
+            -- removed collapse/expand; sections are always open
 
             local itemHandling = {}
 
@@ -1020,13 +959,9 @@ function Fun.Create(title)
                             game.TweenService:Create(closeDropdown, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                                 Rotation = 0
                             }):Play()
-                            wait(0.1)
-                            sectionFrame:TweenSize(UDim2.new(0.956,0, 0, sectionListLayout.AbsoluteContentSize.Y + 8), "InOut", "Linear", 0.1)
-                            wait(0.1)
                             game.TweenService:Create(dropcover, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                                 BackgroundTransparency = 1
                             }):Play()
-                            wait(0.1)
                             UpdateSize()
                         else
                             dropped = true
@@ -1034,13 +969,9 @@ function Fun.Create(title)
                             game.TweenService:Create(closeDropdown, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                                 Rotation = 180
                             }):Play()
-                            wait(0.1)
-                            sectionFrame:TweenSize(UDim2.new(0.956,0, 0, sectionListLayout.AbsoluteContentSize.Y + 8), "InOut", "Linear", 0.1)
-                            wait(0.1)
                             game.TweenService:Create(dropcover, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                                 BackgroundTransparency = 0
                             }):Play()
-                            wait(0.1)
                             UpdateSize()
                         end
                     end)
@@ -1102,13 +1033,9 @@ function Fun.Create(title)
                                 game.TweenService:Create(closeDropdown, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                                     Rotation = 0
                                 }):Play()
-                                wait(0.1)
-                                sectionFrame:TweenSize(UDim2.new(0.956,0, 0, sectionListLayout.AbsoluteContentSize.Y + 8), "InOut", "Linear", 0.1)
-                                wait(0.1)
                                 game.TweenService:Create(dropcover, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                                     BackgroundTransparency = 1
                                 }):Play()
-                                wait(0.1)
                                 UpdateSize()
                             end)
 
