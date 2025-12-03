@@ -1,0 +1,2154 @@
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
+
+]]--
+
+local v0 = loadstring(game:HttpGet("https://raw.githubusercontent.com/flog-gok/customs/refs/heads/main/custom%20linoria"))();
+local v1 = game:GetService("RunService");
+local v2 = game:GetService("Players");
+local v3 = v2.LocalPlayer;
+local v4 = game:GetService("UserInputService");
+local v5 = game:GetService("TweenService");
+local v6 = workspace.CurrentCamera or workspace:WaitForChild("CurrentCamera");
+local v7 = v6.FieldOfView;
+local v8 = {};
+local v9 = 0;
+local v10 = Vector2.new(0, 0);
+local v11 = v0:CreateWindow({Title="Simfonia.HUB v4 re-build!",Center=true,AutoShow=true,Size=UDim2.new(0, 670, 0, 600)});
+local v12 = {Legit=v11:AddTab("legit"),AntiAim=v11:AddTab("Anti Aim"),Render=v11:AddTab("Render"),Visual=v11:AddTab("Visual"),Hacks=v11:AddTab("Hacks"),Settings=v11:AddTab("Settings")};
+local v13 = game:GetService("HttpService");
+local v14 = {};
+do
+	v14.Folder = "LinoriaLibSettings";
+	v14.Library = nil;
+	v14.BuiltInThemes = {Default={1,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"1c1c1c","AccentColor":"0055ff","BackgroundColor":"141414","OutlineColor":"323232"}')},BBot={2,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"1e1e1e","AccentColor":"7e48a3","BackgroundColor":"232323","OutlineColor":"141414"}')},Fatality={3,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"1e1842","AccentColor":"c50754","BackgroundColor":"191335","OutlineColor":"3c355d"}')},Jester={4,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"242424","AccentColor":"db4467","BackgroundColor":"1c1c1c","OutlineColor":"373737"}')},Mint={5,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"242424","AccentColor":"3db488","BackgroundColor":"1c1c1c","OutlineColor":"373737"}')},["Tokyo Night"]={6,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"191925","AccentColor":"6759b3","BackgroundColor":"16161f","OutlineColor":"323232"}')},Ubuntu={7,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"3e3e3e","AccentColor":"e2581e","BackgroundColor":"323232","OutlineColor":"191919"}')},Quartz={8,v13:JSONDecode('{"FontColor":"ffffff","MainColor":"232330","AccentColor":"426e87","BackgroundColor":"1d1b26","OutlineColor":"27232f"}')}};
+	v14.ApplyTheme = function(v492, v493)
+		local v494 = v492:GetCustomTheme(v493);
+		local v495 = v494 or v492.BuiltInThemes[v493];
+		if not v495 then
+			return;
+		end
+		local v496 = v495[2];
+		for v678, v679 in next, v494 or v496 do
+			v492.Library[v678] = Color3.fromHex(v679);
+			if Options[v678] then
+				Options[v678]:SetValueRGB(Color3.fromHex(v679));
+			end
+		end
+		v492:ThemeUpdate();
+	end;
+	v14.ThemeUpdate = function(v497)
+		local v498 = {"FontColor","MainColor","AccentColor","BackgroundColor","OutlineColor"};
+		for v681, v682 in next, v498 do
+			if (Options and Options[v682]) then
+				v497.Library[v682] = Options[v682].Value;
+			end
+		end
+		v497.Library.AccentColorDark = v497.Library:GetDarkerColor(v497.Library.AccentColor);
+		v497.Library:UpdateColorsUsingRegistry();
+	end;
+	v14.LoadDefault = function(v500)
+		local v501 = "Default";
+		local v502 = isfile(v500.Folder .. "/themes/default.txt") and readfile(v500.Folder .. "/themes/default.txt");
+		local v503 = true;
+		if v502 then
+			if v500.BuiltInThemes[v502] then
+				v501 = v502;
+			elseif v500:GetCustomTheme(v502) then
+				v501 = v502;
+				v503 = false;
+			end
+		elseif v500.BuiltInThemes[v500.DefaultTheme] then
+			v501 = v500.DefaultTheme;
+		end
+		if v503 then
+			Options.ThemeManager_ThemeList:SetValue(v501);
+		else
+			v500:ApplyTheme(v501);
+		end
+	end;
+	v14.SaveDefault = function(v504, v505)
+		writefile(v504.Folder .. "/themes/default.txt", v505);
+	end;
+	v14.CreateThemeManager = function(v506, v507)
+		v507:AddLabel("Background color"):AddColorPicker("BackgroundColor", {Default=v506.Library.BackgroundColor});
+		v507:AddLabel("Main color"):AddColorPicker("MainColor", {Default=v506.Library.MainColor});
+		v507:AddLabel("Accent color"):AddColorPicker("AccentColor", {Default=v506.Library.AccentColor});
+		v507:AddLabel("Outline color"):AddColorPicker("OutlineColor", {Default=v506.Library.OutlineColor});
+		v507:AddLabel("Font color"):AddColorPicker("FontColor", {Default=v506.Library.FontColor});
+		local v508 = {};
+		for v683, v684 in next, v506.BuiltInThemes do
+			table.insert(v508, v683);
+		end
+		table.sort(v508, function(v685, v686)
+			return v506.BuiltInThemes[v685][1] < v506.BuiltInThemes[v686][1];
+		end);
+		v507:AddDivider();
+		v507:AddDropdown("ThemeManager_ThemeList", {Text="Theme list",Values=v508,Default=1});
+		v507:AddButton("Set as default", function()
+			v506:SaveDefault(Options.ThemeManager_ThemeList.Value);
+			v506.Library:Notify(string.format("Set default theme to %q", Options.ThemeManager_ThemeList.Value));
+		end);
+		Options.ThemeManager_ThemeList:OnChanged(function()
+			v506:ApplyTheme(Options.ThemeManager_ThemeList.Value);
+		end);
+		v507:AddDivider();
+		v507:AddInput("ThemeManager_CustomThemeName", {Text="Custom theme name"});
+		v507:AddDropdown("ThemeManager_CustomThemeList", {Text="Custom themes",Values=v506:ReloadCustomThemes(),AllowNull=true,Default=1});
+		v507:AddDivider();
+		v507:AddButton("Save theme", function()
+			v506:SaveCustomTheme(Options.ThemeManager_CustomThemeName.Value);
+			Options.ThemeManager_CustomThemeList:SetValues(v506:ReloadCustomThemes());
+			Options.ThemeManager_CustomThemeList:SetValue(nil);
+		end):AddButton("Load theme", function()
+			v506:ApplyTheme(Options.ThemeManager_CustomThemeList.Value);
+		end);
+		v507:AddButton("Refresh list", function()
+			Options.ThemeManager_CustomThemeList:SetValues(v506:ReloadCustomThemes());
+			Options.ThemeManager_CustomThemeList:SetValue(nil);
+		end);
+		v507:AddButton("Set as default", function()
+			if ((Options.ThemeManager_CustomThemeList.Value ~= nil) and (Options.ThemeManager_CustomThemeList.Value ~= "")) then
+				v506:SaveDefault(Options.ThemeManager_CustomThemeList.Value);
+				v506.Library:Notify(string.format("Set default theme to %q", Options.ThemeManager_CustomThemeList.Value));
+			end
+		end);
+		v14:LoadDefault();
+		local function v509()
+			v506:ThemeUpdate();
+		end
+		Options.BackgroundColor:OnChanged(v509);
+		Options.MainColor:OnChanged(v509);
+		Options.AccentColor:OnChanged(v509);
+		Options.OutlineColor:OnChanged(v509);
+		Options.FontColor:OnChanged(v509);
+	end;
+	v14.GetCustomTheme = function(v510, v511)
+		local v512 = v510.Folder .. "/themes/" .. v511;
+		if not isfile(v512) then
+			return nil;
+		end
+		local v513 = readfile(v512);
+		local v514, v515 = pcall(v13.JSONDecode, v13, v513);
+		if not v514 then
+			return nil;
+		end
+		return v515;
+	end;
+	v14.SaveCustomTheme = function(v516, v517)
+		if (v517:gsub(" ", "") == "") then
+			return v516.Library:Notify("Invalid file name for theme (empty)", 3);
+		end
+		local v518 = {};
+		local v519 = {"FontColor","MainColor","AccentColor","BackgroundColor","OutlineColor"};
+		for v687, v688 in next, v519 do
+			v518[v688] = Options[v688].Value:ToHex();
+		end
+		writefile(v516.Folder .. "/themes/" .. v517 .. ".json", v13:JSONEncode(v518));
+	end;
+	v14.ReloadCustomThemes = function(v520)
+		local v521 = listfiles(v520.Folder .. "/themes");
+		local v522 = {};
+		for v690 = 1, #v521 do
+			local v691 = v521[v690];
+			if (v691:sub(-5) == ".json") then
+				local v916 = v691:find(".json", 1, true);
+				local v917 = v691:sub(v916, v916);
+				while (v917 ~= "/") and (v917 ~= "\\") and (v917 ~= "") do
+					v916 = v916 - 1;
+					v917 = v691:sub(v916, v916);
+				end
+				if ((v917 == "/") or (v917 == "\\")) then
+					table.insert(v522, v691:sub(v916 + 1));
+				end
+			end
+		end
+		return v522;
+	end;
+	v14.SetLibrary = function(v523, v524)
+		v523.Library = v524;
+	end;
+	v14.BuildFolderTree = function(v526)
+		local v527 = {};
+		local v528 = v526.Folder:split("/");
+		for v692 = 1, #v528 do
+			v527[#v527 + 1] = table.concat(v528, "/", 1, v692);
+		end
+		table.insert(v527, v526.Folder .. "/themes");
+		table.insert(v527, v526.Folder .. "/settings");
+		for v694 = 1, #v527 do
+			local v695 = v527[v694];
+			if not isfolder(v695) then
+				makefolder(v695);
+			end
+		end
+	end;
+	v14.SetFolder = function(v529, v530)
+		v529.Folder = v530;
+		v529:BuildFolderTree();
+	end;
+	v14.CreateGroupBox = function(v532, v533)
+		assert(v532.Library, "Must set ThemeManager.Library first!");
+		return v533:AddLeftGroupbox("Themes");
+	end;
+	v14.ApplyToTab = function(v534, v535)
+		assert(v534.Library, "Must set ThemeManager.Library first!");
+		local v536 = v534:CreateGroupBox(v535);
+		v534:CreateThemeManager(v536);
+	end;
+	v14.ApplyToGroupbox = function(v537, v538)
+		assert(v537.Library, "Must set ThemeManager.Library first!");
+		v537:CreateThemeManager(v538);
+	end;
+	v14:BuildFolderTree();
+end
+local v15 = {};
+do
+	v15.Folder = "LinoriaLibSettings";
+	v15.Ignore = {};
+	v15.Parser = {Toggle={Save=function(v539, v540)
+		return {type="Toggle",idx=v539,value=v540.Value};
+	end,Load=function(v541, v542)
+		if Toggles[v541] then
+			Toggles[v541]:SetValue(v542.value);
+		end
+	end},Dropdown={Save=function(v543, v544)
+		return {type="Dropdown",idx=v543,value=v544.Value,multi=v544.Multi};
+	end,Load=function(v545, v546)
+		if (Options[v545] and v546.value) then
+			Options[v545]:SetValue(v546.value);
+		end
+	end},ColorPicker={Save=function(v547, v548)
+		return {type="ColorPicker",idx=v547,value=v548.Value:ToHex(),transparency=v548.Transparency};
+	end,Load=function(v549, v550)
+		if (Options[v549] and v550.value) then
+			Options[v549]:SetValueRGB(Color3.fromHex(v550.value));
+			if Options[v549].Transparency then
+				Options[v549]:SetValueTransparency(v550.transparency);
+			end
+		end
+	end},KeyPicker={Save=function(v551, v552)
+		return {type="KeyPicker",idx=v551,value=v552.Value,mode=v552.Mode};
+	end,Load=function(v553, v554)
+		if (Options[v553] and v554.value) then
+			Options[v553]:SetValue(v554.value);
+		end
+	end},Input={Save=function(v555, v556)
+		return {type="Input",idx=v555,value=v556.Value};
+	end,Load=function(v557, v558)
+		if (Options[v557] and v558.value) then
+			Options[v557]:SetValue(v558.value);
+		end
+	end},Toggle={Save=function(v559, v560)
+		return {type="Toggle",idx=v559,value=v560.Value};
+	end,Load=function(v561, v562)
+		if Toggles[v561] then
+			Toggles[v561]:SetValue(v562.value);
+		end
+	end}};
+	v15.Save = function(v563, v564)
+		if not v564 then
+			return false, "no config file is selected";
+		end
+		local v565 = v563.Folder .. "/settings/" .. v564 .. ".json";
+		local v566 = {objects={}};
+		for v696, v697 in next, Toggles do
+			if v563.Ignore[v696] then
+				continue;
+			end
+			table.insert(v566.objects, v563.Parser.Toggle.Save(v696, v697));
+		end
+		for v698, v699 in next, Options do
+			if v563.Ignore[v698] then
+				continue;
+			end
+			if not v563.Parser[v699.Type] then
+				continue;
+			end
+			table.insert(v566.objects, v563.Parser[v699.Type].Save(v698, v699));
+		end
+		local v567, v568 = pcall(v13.JSONEncode, v13, v566);
+		if not v567 then
+			return false, "failed to encode data";
+		end
+		writefile(v565, v568);
+		return true;
+	end;
+	v15.Load = function(v569, v570)
+		if not v570 then
+			return false, "no config file is selected";
+		end
+		local v571 = v569.Folder .. "/settings/" .. v570 .. ".json";
+		if not isfile(v571) then
+			return false, "invalid file";
+		end
+		local v572, v573 = pcall(v13.JSONDecode, v13, readfile(v571));
+		if not v572 then
+			return false, "decode error";
+		end
+		for v700, v701 in next, v573.objects do
+			if v569.Parser[v701.type] then
+				v569.Parser[v701.type].Load(v701.idx, v701);
+			end
+		end
+		return true;
+	end;
+	v15.IgnoreThemeSettings = function(v574)
+		v574:IgnoreIndexes({"BackgroundColor","MainColor","AccentColor","OutlineColor","FontColor","ThemeManager_ThemeList","ThemeManager_CustomThemeName","ThemeManager_CustomThemeList"});
+	end;
+	v15.IgnoreIndexes = function(v575, v576)
+		for v702, v703 in next, v576 do
+			v575.Ignore[v703] = true;
+		end
+	end;
+	v15.LoadAutoloadConfig = function(v577)
+		if isfile(v577.Folder .. "/settings/autoload.txt") then
+			local v824 = readfile(v577.Folder .. "/settings/autoload.txt");
+			local v825, v826 = v577:Load(v824);
+			if not v825 then
+				return v577.Library:Notify("failed to load autoload config: " .. v826);
+			end
+			v577.Library:Notify(string.format("Auto loaded config %q", v824));
+		end
+	end;
+	v15.CreateConfigSaveLoad = function(v578, v579)
+		v579:AddInput("SaveManager_ConfigName", {Text="Config name"});
+		v579:AddDropdown("SaveManager_ConfigList", {Text="Config list",Values=v578:ReloadConfigList(),AllowNull=true,Default=1});
+		v579:AddButton("Create config", function()
+			local v705 = Options.SaveManager_ConfigName.Value;
+			if (v705:gsub(" ", "") == "") then
+				return v578.Library:Notify("invalid config name (empty)", 3);
+			end
+			local v706, v707 = v578:Save(v705);
+			if not v706 then
+				return v578.Library:Notify("failed to create config: " .. v707, 3);
+			end
+			v578.Library:Notify(string.format("created config %q", v705));
+			Options.SaveManager_ConfigList:SetValues(v578:ReloadConfigList());
+			Options.SaveManager_ConfigList:SetValue(nil);
+		end);
+		v579:AddButton("Load config", function()
+			local v708 = Options.SaveManager_ConfigList.Value;
+			local v709, v710 = v578:Load(v708);
+			if not v709 then
+				return v578.Library:Notify("failed to load config: " .. v710, 3);
+			end
+			v578.Library:Notify(string.format("loaded config %q", v708));
+		end);
+		v579:AddButton("Overwrite config", function()
+			local v711 = Options.SaveManager_ConfigList.Value;
+			local v712, v713 = v578:Save(v711);
+			if not v712 then
+				return v578.Library:Notify("failed to overwrite config: " .. v713, 3);
+			end
+			v578.Library:Notify(string.format("overwritten config %q", v711));
+		end);
+		v579:AddButton("Refresh list", function()
+			Options.SaveManager_ConfigList:SetValues(v578:ReloadConfigList());
+			Options.SaveManager_ConfigList:SetValue(nil);
+		end);
+		v579:AddButton("Set as autoload", function()
+			local v714 = Options.SaveManager_ConfigList.Value;
+			writefile(v578.Folder .. "/settings/autoload.txt", v714);
+			v15.AutoloadLabel:SetText("Current autoload config: " .. v714);
+			v578.Library:Notify(string.format("set %q to autoload", v714));
+		end);
+		v15.AutoloadLabel = v579:AddLabel("Current autoload config: none", true);
+		if isfile(v578.Folder .. "/settings/autoload.txt") then
+			local v827 = readfile(v578.Folder .. "/settings/autoload.txt");
+			v15.AutoloadLabel:SetText("Current autoload config: " .. v827);
+		end
+		v578:LoadAutoloadConfig();
+	end;
+	v15.ReloadConfigList = function(v581)
+		local v582 = listfiles(v581.Folder .. "/settings");
+		local v583 = {};
+		for v715 = 1, #v582 do
+			local v716 = v582[v715];
+			if (v716:sub(-5) == ".json") then
+				local v918 = v716:find(".json", 1, true);
+				local v919 = v918;
+				local v920 = v716:sub(v918, v918);
+				while (v920 ~= "/") and (v920 ~= "\\") and (v920 ~= "") do
+					v918 = v918 - 1;
+					v920 = v716:sub(v918, v918);
+				end
+				if ((v920 == "/") or (v920 == "\\")) then
+					table.insert(v583, v716:sub(v918 + 1, v919 - 1));
+				end
+			end
+		end
+		return v583;
+	end;
+	v15.SetFolder = function(v584, v585)
+		v584.Folder = v585;
+		v584:BuildFolderTree();
+	end;
+	v15.BuildFolderTree = function(v587)
+		local v588 = {};
+		local v589 = v587.Folder:split("/");
+		for v717 = 1, #v589 do
+			v588[#v588 + 1] = table.concat(v589, "/", 1, v717);
+		end
+		table.insert(v588, v587.Folder .. "/themes");
+		table.insert(v588, v587.Folder .. "/settings");
+		for v719 = 1, #v588 do
+			local v720 = v588[v719];
+			if not isfolder(v720) then
+				makefolder(v720);
+			end
+		end
+	end;
+	v15.SetLibrary = function(v590, v591)
+		v590.Library = v591;
+	end;
+	v15.CreateGroupBox = function(v593, v594)
+		assert(v593.Library, "Must set SaveManager.Library first!");
+		return v594:AddRightGroupbox("Configs");
+	end;
+	v15.ApplyToTab = function(v595, v596)
+		assert(v595.Library, "Must set SaveManager.Library first!");
+		local v597 = v595:CreateGroupBox(v596);
+		v595:CreateConfigSaveLoad(v597);
+	end;
+	v15:BuildFolderTree();
+end
+local v16 = {Enabled=false,Box=false,Health=false,HeldItem=false,Distance=false,Name=false,Color=Color3.fromRGB(0, 255, 0)};
+local v17 = {ViewModelEnabled=false,FOV=70,CircleColor="BlueFade",AvailableColors={"BlueFade","RGBBlue","RGB"},HasBeenDisabled=false,AspectRatioEnabled=false,AspectRatioValue=0.6};
+local v18 = {Enabled=false,CircleSize=Vector3.new(5, 5, 1),EffectTime=1.5,ShrinkTime=0.3,CircleColor=Color3.fromRGB(255, 200, 255),CircleTransparency=0.2};
+local v19 = {Enabled=false};
+local v20 = {Enabled=false};
+local function v21()
+	if not game:IsLoaded() then
+		repeat
+			task.wait();
+		until game:IsLoaded() 
+	end
+	coroutine.wrap(function()
+		local v598 = workspace:FindFirstChildOfClass("Terrain");
+		if not v598 then
+			repeat
+				task.wait();
+			until workspace:FindFirstChildOfClass("Terrain") 
+			v598 = workspace:FindFirstChildOfClass("Terrain");
+		end
+		if sethiddenproperty then
+			sethiddenproperty(v598, "Decoration", not v19.Enabled);
+		else
+			warn("Your exploit does not support sethiddenproperty");
+		end
+	end)();
+end
+local function v22()
+	if not game:IsLoaded() then
+		repeat
+			task.wait();
+		until game:IsLoaded() 
+	end
+	coroutine.wrap(function()
+		local v599 = game:GetService("Lighting");
+		if sethiddenproperty then
+			sethiddenproperty(v599, "GlobalShadows", not v20.Enabled);
+		else
+			warn("Your exploit does not support sethiddenproperty");
+		end
+	end)();
+end
+local v23 = {Enabled=false,RGBEnabled=false,MenuVisible=true};
+local v24 = {Enabled=false};
+local v25 = {Enabled=false};
+local v26 = {Enabled=false};
+local v27 = {Enabled=false,Speed=20,Bind=nil,HasBeenDisabled=false};
+getgenv().TpWalking = false;
+getgenv().Speed = 10;
+getgenv().CframeSpeed = 5;
+getgenv().CframeEnabled = false;
+local v32 = {Enabled=false,Speed=20};
+local v33 = {Enabled=false};
+local v34 = {Enabled=false,Speed=10,HasBeenDisabled=false};
+local v35 = {Enabled=false,CycleMode="nebula",AvailableCycles={"nebula","vaporwave","clouds","twilight","Cloudy Skies","Dark blue","Pink Daylight","Night","Space","pink vision","animeskybox","Alien Red","Counter Strike City","Dark City","Earth","Mountains","Old Skybox","Red Sky","Stormy Sky","Wasteland","Bobux Generator","Blue Sky","Green Sky"}};
+local v36 = {nebula={SkyboxLf="rbxassetid://159454286",SkyboxBk="rbxassetid://159454299",SkyboxDn="rbxassetid://159454296",SkyboxFt="rbxassetid://159454293",SkyboxRt="rbxassetid://159454300",SkyboxUp="rbxassetid://159454288"},vaporwave={SkyboxLf="rbxassetid://1417494402",SkyboxBk="rbxassetid://1417494030",SkyboxDn="rbxassetid://1417494146",SkyboxFt="rbxassetid://1417494253",SkyboxRt="rbxassetid://1417494499",SkyboxUp="rbxassetid://1417494643"},clouds={SkyboxLf="rbxassetid://570557620",SkyboxBk="rbxassetid://570557514",SkyboxDn="rbxassetid://570557775",SkyboxFt="rbxassetid://570557559",SkyboxRt="rbxassetid://570557672",SkyboxUp="rbxassetid://570557727"},twilight={SkyboxLf="rbxassetid://264909758",SkyboxBk="rbxassetid://264908339",SkyboxDn="rbxassetid://264907909",SkyboxFt="rbxassetid://264909420",SkyboxRt="rbxassetid://264908886",SkyboxUp="rbxassetid://264907379"},["Cloudy Skies"]={SkyboxLf="rbxassetid://252760980",SkyboxBk="rbxassetid://252760981",SkyboxDn="rbxassetid://252763035",SkyboxFt="rbxassetid://252761439",SkyboxRt="rbxassetid://252760986",SkyboxUp="rbxassetid://252762652"},["Dark blue"]={SkyboxLf="rbxassetid://30306626",SkyboxBk="rbxassetid://30306692",SkyboxDn="rbxassetid://25901058",SkyboxFt="rbxassetid://30306730",SkyboxRt="rbxassetid://30306661",SkyboxUp="rbxassetid://30306770"},["Pink Daylight"]={SkyboxBk="rbxassetid://271042516",SkyboxDn="rbxassetid://271077243",SkyboxFt="rbxassetid://271042556",SkyboxLf="rbxassetid://271042310",SkyboxRt="rbxassetid://271042467",SkyboxUp="rbxassetid://271077958"},Night={SkyboxBk="http://www.roblox.com/asset/?id=12064107",SkyboxDn="http://www.roblox.com/asset/?id=12064152",SkyboxFt="http://www.roblox.com/asset/?id=12064121",SkyboxLf="http://www.roblox.com/asset/?id=12063984",SkyboxRt="http://www.roblox.com/asset/?id=12064115",SkyboxUp="http://www.roblox.com/asset/?id=12064131"},Space={SkyboxBk="http://www.roblox.com/asset/?id=149397692",SkyboxDn="http://www.roblox.com/asset/?id=149397686",SkyboxFt="http://www.roblox.com/asset/?id=149397697",SkyboxLf="http://www.roblox.com/asset/?id=149397684",SkyboxRt="http://www.roblox.com/asset/?id=149397688",SkyboxUp="http://www.roblox.com/asset/?id=149397702"},["pink vision"]={SkyboxBk="http://www.roblox.com/asset/?id=6593929026",SkyboxDn="http://www.roblox.com/asset/?id=6593930140",SkyboxFt="http://www.roblox.com/asset/?id=6593931249",SkyboxLf="http://www.roblox.com/asset/?id=6593932587",SkyboxRt="http://www.roblox.com/asset/?id=6593933789",SkyboxUp="http://www.roblox.com/asset/?id=6593935319"},animeskybox={SkyboxBk="http://www.roblox.com/asset/?id=6598038571",SkyboxDn="http://www.roblox.com/asset/?id=6598060864",SkyboxFt="http://www.roblox.com/asset/?id=6598069162",SkyboxLf="http://www.roblox.com/asset/?id=6598081281",SkyboxRt="http://www.roblox.com/asset/?id=6598083861",SkyboxUp="http://www.roblox.com/asset/?id=6598088065"},["Alien Red"]={SkyboxBk="http://www.roblox.com/asset/?id=1012890",SkyboxDn="http://www.roblox.com/asset/?id=1012891",SkyboxFt="http://www.roblox.com/asset/?id=1012887",SkyboxLf="http://www.roblox.com/asset/?id=1012889",SkyboxRt="http://www.roblox.com/asset/?id=1012888",SkyboxUp="http://www.roblox.com/asset/?id=1014449"},["Counter Strike City"]={SkyboxBk="http://www.roblox.com/asset/?id=2240134413",SkyboxDn="http://www.roblox.com/asset/?id=2240136039",SkyboxFt="http://www.roblox.com/asset/?id=2240130790",SkyboxLf="http://www.roblox.com/asset/?id=2240133550",SkyboxRt="http://www.roblox.com/asset/?id=2240132643",SkyboxUp="http://www.roblox.com/asset/?id=2240135222"},["Dark City"]={SkyboxBk="http://www.roblox.com/asset/?id=1424486234",SkyboxDn="http://www.roblox.com/asset/?id=1424485998",SkyboxFt="http://www.roblox.com/asset/?id=1424485697",SkyboxLf="http://www.roblox.com/asset/?id=1424484951",SkyboxRt="http://www.roblox.com/asset/?id=1424484760",SkyboxUp="http://www.roblox.com/asset/?id=1424484510"},Earth={SkyboxBk="http://www.roblox.com/asset/?id=166509999",SkyboxDn="http://www.roblox.com/asset/?id=166510057",SkyboxFt="http://www.roblox.com/asset/?id=166510116",SkyboxLf="http://www.roblox.com/asset/?id=166510092",SkyboxRt="http://www.roblox.com/asset/?id=166510131",SkyboxUp="http://www.roblox.com/asset/?id=166510114"},Mountains={SkyboxBk="http://www.roblox.com/asset/?id=368385273",SkyboxDn="http://www.roblox.com/asset/?id=48015300",SkyboxFt="http://www.roblox.com/asset/?id=368388290",SkyboxLf="http://www.roblox.com/asset/?id=368390615",SkyboxRt="http://www.roblox.com/asset/?id=368385190",SkyboxUp="http://www.roblox.com/asset/?id=48015387"},["Old Skybox"]={SkyboxBk="http://www.roblox.com/asset/?id=15436783",SkyboxDn="http://www.roblox.com/asset/?id=15436796",SkyboxFt="http://www.roblox.com/asset/?id=15436831",SkyboxLf="http://www.roblox.com/asset/?id=15437157",SkyboxRt="http://www.roblox.com/asset/?id=15437166",SkyboxUp="http://www.roblox.com/asset/?id=15437184"},["Red Sky"]={SkyboxBk="http://www.roblox.com/asset/?id=401664839",SkyboxDn="http://www.roblox.com/asset/?id=401664862",SkyboxFt="http://www.roblox.com/asset/?id=401664960",SkyboxLf="http://www.roblox.com/asset/?id=401664881",SkyboxRt="http://www.roblox.com/asset/?id=401664901",SkyboxUp="http://www.roblox.com/asset/?id=401664936"},["Stormy Sky"]={SkyboxBk="http://www.roblox.com/asset/?id=1327366",SkyboxDn="http://www.roblox.com/asset/?id=1327367",SkyboxFt="http://www.roblox.com/asset/?id=1327362",SkyboxLf="http://www.roblox.com/asset/?id=1327363",SkyboxRt="http://www.roblox.com/asset/?id=1327361",SkyboxUp="http://www.roblox.com/asset/?id=1327368"},Wasteland={SkyboxBk="http://www.roblox.com/asset/?id=2046134302",SkyboxDn="http://www.roblox.com/asset/?id=2046134976",SkyboxFt="http://www.roblox.com/asset/?id=2046135977",SkyboxLf="http://www.roblox.com/asset/?id=2046135392",SkyboxRt="http://www.roblox.com/asset/?id=2046136939",SkyboxUp="http://www.roblox.com/asset/?id=2046136551"},["Bobux Generator"]={SkyboxBk="http://www.roblox.com/asset/?id=6599826528",SkyboxDn="http://www.roblox.com/asset/?id=6599827328",SkyboxFt="http://www.roblox.com/asset/?id=6599833356",SkyboxLf="http://www.roblox.com/asset/?id=6599835206",SkyboxRt="http://www.roblox.com/asset/?id=6599835755",SkyboxUp="http://www.roblox.com/asset/?id=6599836686"},["Blue Sky"]={SkyboxBk="http://www.roblox.com/asset/?id=226060119",SkyboxDn="http://www.roblox.com/asset/?id=226060115",SkyboxFt="http://www.roblox.com/asset/?id=226060143",SkyboxLf="http://www.roblox.com/asset/?id=226060136",SkyboxRt="http://www.roblox.com/asset/?id=226060155",SkyboxUp="http://www.roblox.com/asset/?id=226060167"},["Green Sky"]={SkyboxBk="http://www.roblox.com/asset/?id=157711514",SkyboxDn="http://www.roblox.com/asset/?id=157711501",SkyboxFt="http://www.roblox.com/asset/?id=157711522",SkyboxLf="http://www.roblox.com/asset/?id=157711494",SkyboxRt="http://www.roblox.com/asset/?id=157711509",SkyboxUp="http://www.roblox.com/asset/?id=157711528"}};
+local v37 = {Enabled=false,Type="DotCircle",AvailableTypes={"DotCircle","Cross"},RGBEnabled=false,SpinEnabled=false,SpinSpeed=1,RainbowSpeed=1,Size=10,Thickness=1};
+local v38 = {Enabled=false,TargetPart="Head",Smoothness=50,FOVEnabled=false,FOVSize=200,SnaplineEnabled=false,Priority="Nearest",BindType="Mouse",MouseBind=Enum.UserInputType.MouseButton2,KeyBind=nil};
+local v39 = {Enabled=false,FOVEnabled=false,FOVSize=200,SnaplineEnabled=false,TargetPart="Head",KeyBind=nil,MouseBind=nil};
+local v40 = {Enabled=false,Size=1,Transparency=0.5,TargetPart="HumanoidRootPart"};
+local v41 = {Enabled=false};
+local v42 = {Enabled=false,KeyBind=nil,MouseBind=nil};
+local v43 = {Enabled=false,Speed=10};
+local v44 = {Enabled=false,Distance=20,Height=5,Sensitivity=0.25,Yaw=0,Pitch=0,CameraEnabled=false,Connections={}};
+local v45 = {DeleteTextureEnabled=false,XRayEnabled=false,XRayTransparency=0.5,ExitGameEnabled=false,ExitGameKeyBind=nil,ExitGameMouseBind=nil};
+local v46 = {Enabled=false};
+local v47 = {};
+local v48 = {};
+local v49 = v12.Settings:AddLeftGroupbox("Settings");
+v49:AddToggle("WatermarkEnabled", {Text="Watermark",Default=true,Tooltip="Показывать/скрывать watermark"});
+Toggles.WatermarkEnabled:OnChanged(function()
+	v0:SetWatermarkVisibility(Toggles.WatermarkEnabled.Value);
+	v0:Notify("Watermark " .. ((Toggles.WatermarkEnabled.Value and "включён") or "выключен"));
+end);
+v49:AddToggle("KeybindListEnabled", {Text="Keybind List",Default=true,Tooltip="Показывать/скрывать список горячих клавиш"});
+Toggles.KeybindListEnabled:OnChanged(function()
+	v0.KeybindFrame.Visible = Toggles.KeybindListEnabled.Value;
+	v0:Notify("Keybind List " .. ((Toggles.KeybindListEnabled.Value and "включён") or "выключен"));
+end);
+v49:AddToggle("SIMAIEnabled", {Text="SIM AI",Default=v41.Enabled,Tooltip="Активирует SIM AI для выполнения команд /helps - команды"});
+Toggles.SIMAIEnabled:OnChanged(function()
+	v41.Enabled = Toggles.SIMAIEnabled.Value;
+	if v41.Enabled then
+		local v721 = game:GetService("TextChatService");
+		local v722 = v721:FindFirstChild("TextChannels");
+		if v722 then
+			local v921 = v722:FindFirstChild("RBXGeneral") or v722:FindFirstChild("RBXSystem");
+			if v921 then
+				v921:DisplaySystemMessage('<font color="rgb(128,0,128)">SIM AI:</font> SIM AI был активирован.', "System");
+			end
+		end
+		local v723 = Instance.new("ScreenGui");
+		v723.Parent = game:GetService("CoreGui");
+		local v725 = Instance.new("TextLabel");
+		v725.Size = UDim2.new(0, 400, 0, 50);
+		v725.Position = UDim2.new(0.5, -200, 0.5, -25);
+		v725.BackgroundTransparency = 0.5;
+		v725.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+		v725.Text = "SIM AI: Привет, чем могу быть полезен? Для просмотра команд введите /helps.";
+		v725.TextColor3 = Color3.fromRGB(128, 0, 128);
+		v725.TextScaled = true;
+		v725.Parent = v723;
+		task.spawn(function()
+			task.wait(5);
+			v723:Destroy();
+		end);
+	end
+	v0:Notify("SIM AI " .. ((v41.Enabled and "включён") or "выключен"));
+end);
+local v50 = v12.Settings:AddLeftGroupbox("FPS");
+v50:AddToggle("DeleteTextureEnabled", {Text="Delete Texture",Default=v45.DeleteTextureEnabled,Tooltip="Удаляет все текстуры для повышения FPS"});
+Toggles.DeleteTextureEnabled:OnChanged(function()
+	v45.DeleteTextureEnabled = Toggles.DeleteTextureEnabled.Value;
+	if v45.DeleteTextureEnabled then
+		for v828, v829 in pairs(workspace:GetDescendants()) do
+			if (v829:IsA("Decal") or v829:IsA("Texture") or v829:IsA("SurfaceGui")) then
+				v829:Destroy();
+			elseif v829:IsA("BasePart") then
+				v829.Material = Enum.Material.SmoothPlastic;
+				v829.Color = Color3.fromRGB(128, 128, 128);
+			end
+		end
+	end
+	v0:Notify("Delete Texture " .. ((v45.DeleteTextureEnabled and "включён") or "выключен"));
+end);
+v50:AddToggle("ExitGameEnabled", {Text="Exit Game",Default=v45.ExitGameEnabled,Tooltip="Включает бинд для кика из игры"});
+Toggles.ExitGameEnabled:OnChanged(function()
+	v45.ExitGameEnabled = Toggles.ExitGameEnabled.Value;
+	v0:Notify("Exit Game " .. ((v45.ExitGameEnabled and "включён") or "выключен"));
+end);
+v50:AddLabel("Exit Game Keybind"):AddKeyPicker("ExitGameKeyPicker", {Default="None",SyncToggleState=true,Mode="Toggle",Text="Exit Game",NoUI=false,Callback=function(v189)
+	if (v189 and v45.ExitGameEnabled) then
+		v3:Kick("Выход из игры через Exit Game");
+	end
+end,ChangedCallback=function(v190)
+end});
+v50:AddButton({Text="Rejoin",Func=function()
+	v0:Notify("Переподключение к игре...");
+	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, v3);
+end,Tooltip="Переподключает к текущей игре"});
+local v51 = v12.Settings:AddRightGroupbox("Legit Reset");
+v51:AddToggle("LegitResetEnabled", {Text="Legit Reset",Default=v42.Enabled,Tooltip="Включает легитный ресет персонажа по бинду"});
+Toggles.LegitResetEnabled:OnChanged(function()
+	v42.Enabled = Toggles.LegitResetEnabled.Value;
+	v0:Notify("Legit Reset " .. ((v42.Enabled and "включён") or "выключен"));
+end);
+v51:AddLabel("Legit Reset Keybind"):AddKeyPicker("LegitResetKeyPicker", {Default="None",SyncToggleState=true,Mode="Toggle",Text="Legit Reset",NoUI=false,Callback=function(v193)
+	if (v193 and v42.Enabled and v3.Character) then
+		local v734 = v3.Character:FindFirstChild("Humanoid");
+		if v734 then
+			v734:ChangeState(Enum.HumanoidStateType.Dead);
+			v0:Notify("Персонаж сброшен (Legit Reset)");
+		end
+	end
+end,ChangedCallback=function(v194)
+end});
+local v52 = v12.Legit:AddLeftGroupbox("Legit Hacks");
+v52:AddToggle("AimbotEnabled", {Text="Aimbot",Default=v38.Enabled,Tooltip="Автоматически наводит прицел на врагов"});
+Toggles.AimbotEnabled:OnChanged(function()
+	v38.Enabled = Toggles.AimbotEnabled.Value;
+	v0:Notify("Aimbot " .. ((v38.Enabled and "включён") or "выключен"));
+end);
+v52:AddDropdown("AimbotTargetPart", {Text="Целевая часть",Default=v38.TargetPart,Values={"Head","Body"},Tooltip="Выберите часть тела для прицеливания"});
+Options.AimbotTargetPart:OnChanged(function()
+	v38.TargetPart = Options.AimbotTargetPart.Value;
+end);
+v52:AddDropdown("AimbotPriority", {Text="Приоритет цели",Default=v38.Priority,Values={"Nearest","Farthest","Smart"},Tooltip="Выберите приоритет: Nearest - ближний игрок, Farthest - дальний игрок, Smart - ближний к курсору"});
+Options.AimbotPriority:OnChanged(function()
+	v38.Priority = Options.AimbotPriority.Value;
+end);
+v52:AddSlider("AimbotSmoothness", {Text="Плавность наводки",Default=v38.Smoothness,Min=1,Max=100,Rounding=0,Tooltip="Скорость наводки (1-100%)"});
+Options.AimbotSmoothness:OnChanged(function()
+	v38.Smoothness = Options.AimbotSmoothness.Value;
+end);
+v52:AddToggle("AimbotSkipWall", {Text="Пропускать стены",Default=v38.SkipWall,Tooltip="Игнорировать стены при наводке"});
+Toggles.AimbotSkipWall:OnChanged(function()
+	v38.SkipWall = Toggles.AimbotSkipWall.Value;
+end);
+v52:AddToggle("AimbotFOVEnabled", {Text="Включить FOV",Default=v38.FOVEnabled,Tooltip="Ограничивать зону действия FOV"});
+Toggles.AimbotFOVEnabled:OnChanged(function()
+	v38.FOVEnabled = Toggles.AimbotFOVEnabled.Value;
+end);
+v52:AddSlider("AimbotFOVSize", {Text="Размер FOV",Default=v38.FOVSize,Min=1,Max=700,Rounding=0,Tooltip="Размер поля зрения (1-700)"});
+Options.AimbotFOVSize:OnChanged(function()
+	v38.FOVSize = Options.AimbotFOVSize.Value;
+end);
+v52:AddToggle("AimbotSnaplineEnabled", {Text="Включить Snapline",Default=v38.SnaplineEnabled,Tooltip="Показывать линию к цели"});
+Toggles.AimbotSnaplineEnabled:OnChanged(function()
+	v38.SnaplineEnabled = Toggles.AimbotSnaplineEnabled.Value;
+end);
+v52:AddLabel("Aimbot Keybind"):AddKeyPicker("AimbotKeyPicker", {Default="None",SyncToggleState=true,Mode="Hold",Text="Aimbot",NoUI=false,Callback=function(v211)
+end,ChangedCallback=function(v212)
+end});
+local v53 = v12.Legit:AddRightGroupbox("Rage Hacks");
+v53:AddToggle("SilentAimEnabled", {Text="Silent Aim",Default=v39.Enabled,Tooltip="Тихо наводит на цель при стрельбе"});
+Toggles.SilentAimEnabled:OnChanged(function()
+	v39.Enabled = Toggles.SilentAimEnabled.Value;
+	v0:Notify("Silent Aim " .. ((v39.Enabled and "включён") or "выключен"));
+end);
+v53:AddDropdown("SilentAimTargetPart", {Text="Целевая часть",Default=v39.TargetPart,Values={"Head","Body"},Tooltip="Выберите часть тела для наводки"});
+Options.SilentAimTargetPart:OnChanged(function()
+	v39.TargetPart = Options.SilentAimTargetPart.Value;
+end);
+v53:AddToggle("SilentAimFOVEnabled", {Text="Включить FOV",Default=v39.FOVEnabled,Tooltip="Ограничивать зону действия FOV"});
+Toggles.SilentAimFOVEnabled:OnChanged(function()
+	v39.FOVEnabled = Toggles.SilentAimFOVEnabled.Value;
+end);
+v53:AddSlider("SilentAimFOVSize", {Text="Размер FOV",Default=v39.FOVSize,Min=1,Max=700,Rounding=0,Tooltip="Размер поля зрения (1-700)"});
+Options.SilentAimFOVSize:OnChanged(function()
+	v39.FOVSize = Options.SilentAimFOVSize.Value;
+end);
+v53:AddToggle("SilentAimSnaplineEnabled", {Text="Включить Snapline",Default=v39.SnaplineEnabled,Tooltip="Показывать линию к цели"});
+Toggles.SilentAimSnaplineEnabled:OnChanged(function()
+	v39.SnaplineEnabled = Toggles.SilentAimSnaplineEnabled.Value;
+end);
+v53:AddLabel("Silent Aim Keybind"):AddKeyPicker("SilentAimKeyPicker", {Default="None",SyncToggleState=true,Mode="Hold",Text="Silent Aim",NoUI=false,Callback=function(v223)
+end,ChangedCallback=function(v224)
+end});
+local v54 = v12.Legit:AddLeftGroupbox("Hitbox Expander");
+v54:AddToggle("HitboxExpanderEnabled", {Text="Hitbox Expander",Default=v40.Enabled,Tooltip="Увеличивает хитбоксы врагов"});
+Toggles.HitboxExpanderEnabled:OnChanged(function()
+	v40.Enabled = Toggles.HitboxExpanderEnabled.Value;
+	v0:Notify("Hitbox Expander " .. ((v40.Enabled and "включён") or "выключен"));
+end);
+v54:AddSlider("HitboxExpanderSize", {Text="Размер хитбокса",Default=v40.Size,Min=1,Max=40,Rounding=1,Tooltip="Размер хитбокса (1-40 studs)"});
+Options.HitboxExpanderSize:OnChanged(function()
+	v40.Size = Options.HitboxExpanderSize.Value;
+end);
+v54:AddSlider("HitboxExpanderTransparency", {Text="Прозрачность",Default=v40.Transparency,Min=0,Max=1,Rounding=2,Tooltip="Прозрачность хитбокса (0-1)"});
+Options.HitboxExpanderTransparency:OnChanged(function()
+	v40.Transparency = Options.HitboxExpanderTransparency.Value;
+end);
+v54:AddDropdown("HitboxExpanderTargetPart", {Values={"Head","Torso","HumanoidRootPart"},Default=v40.TargetPart,Multi=false,Text="Целевая часть",Tooltip="Выберите какую часть тела расширять"});
+Options.HitboxExpanderTargetPart:OnChanged(function()
+	v40.TargetPart = Options.HitboxExpanderTargetPart.Value;
+end);
+local v55 = v12.AntiAim:AddLeftGroupbox("Anti Aim");
+v55:AddToggle("SpinbotEnabled", {Text="Spinbot",Default=v43.Enabled,Tooltip="Вращает персонажа случайным образом"});
+Toggles.SpinbotEnabled:OnChanged(function()
+	v43.Enabled = Toggles.SpinbotEnabled.Value;
+	v0:Notify("Spinbot " .. ((v43.Enabled and "включён") or "выключен"));
+end);
+v55:AddSlider("SpinbotSpeed", {Text="Скорость вращения",Default=v43.Speed,Min=1,Max=50,Rounding=1,Tooltip="Скорость вращения (1-50)"});
+Options.SpinbotSpeed:OnChanged(function()
+	v43.Speed = Options.SpinbotSpeed.Value;
+end);
+v55:AddToggle("ThirdPersonEnabled", {Text="Third Person",Default=v44.Enabled,Tooltip="Включает камеру от третьего лица"});
+Toggles.ThirdPersonEnabled:OnChanged(function()
+	v44.Enabled = Toggles.ThirdPersonEnabled.Value;
+end);
+v55:AddSlider("ThirdPersonDistance", {Text="Дистанция камеры",Default=v44.Distance,Min=5,Max=50,Rounding=1,Tooltip="Дистанция камеры от персонажа (5-50)"});
+Options.ThirdPersonDistance:OnChanged(function()
+	v44.Distance = Options.ThirdPersonDistance.Value;
+end);
+v55:AddSlider("ThirdPersonHeight", {Text="Высота камеры",Default=v44.Height,Min=0,Max=20,Rounding=1,Tooltip="Высота камеры над персонажем (0-20)"});
+Options.ThirdPersonHeight:OnChanged(function()
+	v44.Height = Options.ThirdPersonHeight.Value;
+end);
+v55:AddSlider("ThirdPersonSensitivity", {Text="Чувствительность мыши",Default=v44.Sensitivity,Min=0.1,Max=1,Rounding=2,Tooltip="Чувствительность мыши для камеры (0.1-1.0)"});
+Options.ThirdPersonSensitivity:OnChanged(function()
+	v44.Sensitivity = Options.ThirdPersonSensitivity.Value;
+end);
+v55:AddLabel("Third Person Keybind"):AddKeyPicker("ThirdPersonKeyPicker", {Default="None",SyncToggleState=false,Mode="Toggle",Text="Toggle Third Person",NoUI=false,Callback=function(v245)
+	v44.Enabled = not v44.Enabled;
+	Toggles.ThirdPersonEnabled:SetValue(v44.Enabled);
+	v0:Notify("Third Person " .. ((v44.Enabled and "включён") or "выключен"));
+end,ChangedCallback=function(v247)
+end});
+local v56 = v12.Render:AddLeftGroupbox("ESP");
+local v57 = v12.Render:AddRightGroupbox("Render Effects");
+local v58 = {Enabled=false,Box=false,BoxColor=Color3.fromRGB(255, 255, 255),HealthBar=false,HealthBarSide="Left",Names=false,NamesOutline=false,NamesColor=Color3.fromRGB(255, 255, 255),NamesOutlineColor=Color3.fromRGB(0, 0, 0),NamesFont=Enum.Font.SourceSans,NamesSize=13,HeldItem=true,Distance=true};
+v56:AddToggle("ESPEnabled", {Text="Включить ESP",Default=v58.Enabled,Tooltip="Включает/выключает ESP для игроков"});
+Toggles.ESPEnabled:OnChanged(function()
+	v58.Enabled = Toggles.ESPEnabled.Value;
+	v0:Notify("ESP " .. ((v58.Enabled and "включён") or "выключен"));
+end);
+v56:AddToggle("ESPBox", {Text="Показывать Box",Default=v58.Box,Tooltip="Отображает рамку вокруг игроков"});
+Toggles.ESPBox:OnChanged(function()
+	v58.Box = Toggles.ESPBox.Value;
+end);
+v56:AddToggle("ESPHealth", {Text="Показывать здоровье",Default=v58.HealthBar,Tooltip="Отображает здоровье игроков"});
+Toggles.ESPHealth:OnChanged(function()
+	v58.HealthBar = Toggles.ESPHealth.Value;
+end);
+v56:AddToggle("ESPHeldItem", {Text="Показывать предмет в руке",Default=v58.HeldItem,Tooltip="Отображает предмет, который держат игроки"});
+Toggles.ESPHeldItem:OnChanged(function()
+	v58.HeldItem = Toggles.ESPHeldItem.Value;
+end);
+v56:AddToggle("ESPDistance", {Text="Показывать дистанцию",Default=v58.Distance,Tooltip="Отображает расстояние до игроков"});
+Toggles.ESPDistance:OnChanged(function()
+	v58.Distance = Toggles.ESPDistance.Value;
+end);
+v56:AddToggle("ESPName", {Text="Показывать имя",Default=v58.Names,Tooltip="Отображает имена игроков"});
+Toggles.ESPName:OnChanged(function()
+	v58.Names = Toggles.ESPName.Value;
+end);
+v56:AddButton({Text="Сбросить настройки ESP",Func=function()
+	v58.Enabled = true;
+	v58.Box = true;
+	v58.HealthBar = true;
+	v58.HeldItem = true;
+	v58.Distance = true;
+	v58.Names = true;
+	Toggles.ESPEnabled:SetValue(true);
+	Toggles.ESPBox:SetValue(true);
+	Toggles.ESPHealth:SetValue(true);
+	Toggles.ESPHeldItem:SetValue(true);
+	Toggles.ESPDistance:SetValue(true);
+	Toggles.ESPName:SetValue(true);
+	v0:Notify("Настройки ESP сброшены!");
+end,Tooltip="Сбрасывает все настройки ESP к стандартным"});
+local v59 = v12.Hacks:AddLeftGroupbox("Movement");
+local v60 = v12.Hacks:AddRightGroupbox("Speedhack");
+local v61 = v12.Hacks:AddLeftGroupbox("Fly & Jump");
+local v62 = v12.Hacks:AddRightGroupbox("Noclip");
+v59:AddToggle("SpiderEnabled", {Text="Spider",Default=v34.Enabled,Tooltip="Позволяет лазить по стенам"});
+Toggles.SpiderEnabled:OnChanged(function()
+	v34.Enabled = Toggles.SpiderEnabled.Value;
+	v0:Notify("Spider " .. ((v34.Enabled and "включён") or "выключен"));
+end);
+v59:AddSlider("SpiderSpeed", {Text="Скорость Spider",Default=v34.Speed,Min=10,Max=40,Rounding=0,Tooltip="Скорость подъёма по стенам (10-40)"});
+Options.SpiderSpeed:OnChanged(function()
+	v34.Speed = Options.SpiderSpeed.Value;
+end);
+v62:AddToggle("NoclipEnabled", {Text="Noclip",Default=v46.Enabled,Tooltip="Включает прохождение сквозь стены"});
+Toggles.NoclipEnabled:OnChanged(function()
+	v46.Enabled = Toggles.NoclipEnabled.Value;
+	v0:Notify("Noclip " .. ((v46.Enabled and "включён") or "выключен"));
+end);
+local v60 = v12.Hacks:AddRightGroupbox("Speedhack");
+v60:AddToggle("SpeedhackEnabled", {Text="Humanoid Speedhack",Default=v27.Enabled,Tooltip="Двигает тело игрока с заданной скоростью"});
+Toggles.SpeedhackEnabled:OnChanged(function()
+	v27.Enabled = Toggles.SpeedhackEnabled.Value;
+	if v27.Enabled then
+		v27.HasBeenDisabled = false;
+	end
+end);
+v60:AddSlider("SpeedhackSpeed", {Text="Humanoid Speed",Default=v27.Speed,Min=20,Max=80,Rounding=0,Tooltip="Скорость передвижения (20-80)"});
+Options.SpeedhackSpeed:OnChanged(function()
+	v27.Speed = Options.SpeedhackSpeed.Value;
+end);
+v60:AddToggle("TpWalkingEnabled", {Text="TP Walking",Default=getgenv().TpWalking,Tooltip="Телепортирует персонажа вперед"});
+Toggles.TpWalkingEnabled:OnChanged(function()
+	getgenv().TpWalking = Toggles.TpWalkingEnabled.Value;
+	if getgenv().TpWalking then
+		task.spawn(function()
+			local v830 = game:GetService("Players").LocalPlayer;
+			local v831 = v830.Character;
+			local v832 = v831 and v831:FindFirstChildWhichIsA("Humanoid");
+			local v833 = game:GetService("RunService").Heartbeat;
+			while getgenv().TpWalking and v831 and v832 and v832.Parent do
+				local v922 = v833:Wait();
+				if (v832.MoveDirection.Magnitude > 0) then
+					v831:TranslateBy(v832.MoveDirection * tonumber(getgenv().Speed) * v922 * 10);
+				else
+					v831:TranslateBy(v832.MoveDirection * v922 * 10);
+				end
+			end
+		end);
+	end
+end);
+v60:AddSlider("TpWalkingSpeed", {Text="TP Speed",Default=getgenv().Speed,Min=5,Max=50,Rounding=0,Tooltip="Скорость телепортации (5-50)"});
+Options.TpWalkingSpeed:OnChanged(function()
+	getgenv().Speed = Options.TpWalkingSpeed.Value;
+end);
+v60:AddToggle("CframeEnabled", {Text="Cframe Speedhack",Default=getgenv().CframeEnabled,Tooltip="Использует CFrame для перемещения"});
+Toggles.CframeEnabled:OnChanged(function()
+	getgenv().CframeEnabled = Toggles.CframeEnabled.Value;
+	if getgenv().CframeEnabled then
+		task.spawn(function()
+			local v834 = game:GetService("Players");
+			local v835 = game:GetService("RunService");
+			local v836 = v834.LocalPlayer;
+			local v837 = v836.Character or v836.CharacterAdded:Wait();
+			local v838 = v837:WaitForChild("HumanoidRootPart");
+			while getgenv().CframeEnabled do
+				v835.RenderStepped:Wait();
+				if (v837 and v837:FindFirstChild("HumanoidRootPart")) then
+					local v1025 = v837.Humanoid.MoveDirection;
+					if (v1025.Magnitude > 0) then
+						v837.HumanoidRootPart.CFrame = v837.HumanoidRootPart.CFrame + ((v1025 * getgenv().CframeSpeed) / 10);
+					end
+				end
+			end
+		end);
+	end
+end);
+v60:AddSlider("CframeSpeed", {Text="Cframe Speed",Default=getgenv().CframeSpeed,Min=10,Max=100,Rounding=0,Tooltip="Скорость Cframe (10-100)"});
+Options.CframeSpeed:OnChanged(function()
+	getgenv().CframeSpeed = Options.CframeSpeed.Value;
+end);
+v60:AddLabel("Humanoid Speedhack Toggle Keybind"):AddKeyPicker("SpeedhackKeyPicker", {Default="None",SyncToggleState=false,Mode="Toggle",Text="Toggle Humanoid Speedhack",NoUI=false,Callback=function(v284)
+	v27.Enabled = not v27.Enabled;
+	Toggles.SpeedhackEnabled:SetValue(v27.Enabled);
+	if v27.Enabled then
+		v27.HasBeenDisabled = false;
+	end
+	v0:Notify("Humanoid Speedhack " .. ((v27.Enabled and "включён") or "выключен"));
+end,ChangedCallback=function(v286)
+end});
+v61:AddToggle("FlyEnabled", {Text="Fly",Default=v32.Enabled,Tooltip="Позволяет летать (WASD + Space/LeftControl)"});
+Toggles.FlyEnabled:OnChanged(function()
+	v32.Enabled = Toggles.FlyEnabled.Value;
+	v0:Notify("Fly " .. ((v32.Enabled and "включён") or "выключен"));
+end);
+v61:AddSlider("FlySpeed", {Text="Скорость Fly",Default=v32.Speed,Min=10,Max=50,Rounding=0,Tooltip="Скорость полёта (10-50)"});
+Options.FlySpeed:OnChanged(function()
+	v32.Speed = Options.FlySpeed.Value;
+end);
+v61:AddToggle("InfiniteJumpEnabled", {Text="Infinite Jump",Default=v33.Enabled,Tooltip="Бесконечные прыжки"});
+Toggles.InfiniteJumpEnabled:OnChanged(function()
+	v33.Enabled = Toggles.InfiniteJumpEnabled.Value;
+	v0:Notify("Infinite Jump " .. ((v33.Enabled and "включён") or "выключен"));
+end);
+local function v63()
+	if v45.XRayEnabled then
+		for v839, v840 in pairs(workspace:GetDescendants()) do
+			if (v840:IsA("BasePart") and not v840:IsA("Terrain")) then
+				if not v47[v840] then
+					v47[v840] = v840.Transparency;
+					v840.Transparency = v45.XRayTransparency;
+				end
+			end
+		end
+	else
+		for v841, v842 in pairs(v47) do
+			if (v841 and v841.Parent and v841:IsA("BasePart")) then
+				v841.Transparency = v842;
+			end
+		end
+		v47 = {};
+	end
+end
+v57:AddToggle("XRayEnabled", {Text="X-Ray",Default=v45.XRayEnabled,Tooltip="Делает текстуры полупрозрачными"});
+Toggles.XRayEnabled:OnChanged(function()
+	v45.XRayEnabled = Toggles.XRayEnabled.Value;
+	v63();
+	v0:Notify("X-Ray " .. ((v45.XRayEnabled and "включён") or "выключен"));
+end);
+v57:AddSlider("XRayTransparency", {Text="Прозрачность X-Ray",Default=v45.XRayTransparency,Min=0.1,Max=1,Rounding=1,Tooltip="Уровень прозрачности для X-Ray (0.1-1.0)"});
+Options.XRayTransparency:OnChanged(function()
+	v45.XRayTransparency = Options.XRayTransparency.Value;
+	if v45.XRayEnabled then
+		for v843, v844 in pairs(workspace:GetDescendants()) do
+			if (v844:IsA("BasePart") and not v844:IsA("Terrain") and v47[v844]) then
+				v844.Transparency = v45.XRayTransparency;
+			end
+		end
+	end
+end);
+local v64 = v12.Visual:AddLeftGroupbox("Visual Settings");
+v64:AddToggle("ViewModelEnabled", {Text="Включить View Model",Default=v17.ViewModelEnabled,Tooltip="Включает/выключает View Model"});
+Toggles.ViewModelEnabled:OnChanged(function()
+	v17.ViewModelEnabled = Toggles.ViewModelEnabled.Value;
+	if v17.ViewModelEnabled then
+		v17.HasBeenDisabled = false;
+	end
+	v0:Notify("View Model " .. ((v17.ViewModelEnabled and "включён") or "выключен"));
+end);
+v64:AddSlider("ViewModelFOV", {Text="FOV View Model",Default=v17.FOV,Min=70,Max=120,Rounding=0,Tooltip="Настройка поля зрения для View Model"});
+Options.ViewModelFOV:OnChanged(function()
+	v17.FOV = Options.ViewModelFOV.Value;
+end);
+v64:AddToggle("AspectRatioEnabled", {Text="Aspect Ratio",Default=v17.AspectRatioEnabled,Tooltip="Включает изменение соотношения сторон камеры"});
+Toggles.AspectRatioEnabled:OnChanged(function()
+	v17.AspectRatioEnabled = Toggles.AspectRatioEnabled.Value;
+	v0:Notify("Aspect Ratio " .. ((v17.AspectRatioEnabled and "включён") or "выключен"));
+end);
+v64:AddSlider("AspectRatioValue", {Text="Ratio Value",Default=v17.AspectRatioValue,Min=0.1,Max=2,Rounding=1,Tooltip="Значение соотношения сторон (0.1-2.0)"});
+Options.AspectRatioValue:OnChanged(function()
+	v17.AspectRatioValue = Options.AspectRatioValue.Value;
+end);
+local v65 = v12.Visual:AddRightGroupbox("Titles");
+v65:AddToggle("TitlesEnabled", {Text="Включить Titles",Default=v23.Enabled,Tooltip="Включает/выключает отображение титулов"});
+Toggles.TitlesEnabled:OnChanged(function()
+	v23.Enabled = Toggles.TitlesEnabled.Value;
+	v0:Notify("Titles " .. ((v23.Enabled and "включены") or "выключены"));
+end);
+v65:AddToggle("TitlesRGB", {Text="RGB для Titles",Default=v23.RGBEnabled,Tooltip="Включает RGB-эффект для титулов"});
+Toggles.TitlesRGB:OnChanged(function()
+	v23.RGBEnabled = Toggles.TitlesRGB.Value;
+end);
+local v66 = v12.Visual:AddRightGroupbox("Staff Visuals");
+v66:AddToggle("FullbrightEnabled", {Text="Fullbright",Default=v24.Enabled,Tooltip="Делает сцену яркой независимо от времени суток"});
+Toggles.FullbrightEnabled:OnChanged(function()
+	v24.Enabled = Toggles.FullbrightEnabled.Value;
+	v0:Notify("Fullbright " .. ((v24.Enabled and "включён") or "выключен"));
+end);
+v66:AddToggle("NoFogEnabled", {Text="No Fog",Default=v25.Enabled,Tooltip="Убирает туман и облака"});
+Toggles.NoFogEnabled:OnChanged(function()
+	v25.Enabled = Toggles.NoFogEnabled.Value;
+	v0:Notify("No Fog " .. ((v25.Enabled and "включён") or "выключен"));
+end);
+v66:AddToggle("NoSkyEnabled", {Text="No Sky",Default=v26.Enabled,Tooltip="Полностью убирает Skybox"});
+Toggles.NoSkyEnabled:OnChanged(function()
+	v26.Enabled = Toggles.NoSkyEnabled.Value;
+	v0:Notify("No Sky " .. ((v26.Enabled and "включён") or "выключен"));
+end);
+v66:AddToggle("NoGrassEnabled", {Text="No Grass",Default=v19.Enabled,Tooltip="Убирает траву и декорации на местности"});
+Toggles.NoGrassEnabled:OnChanged(function()
+	v19.Enabled = Toggles.NoGrassEnabled.Value;
+	v21();
+	v0:Notify("No Grass " .. ((v19.Enabled and "включён") or "выключен"));
+end);
+v66:AddToggle("NoShadowEnabled", {Text="No Shadow",Default=v20.Enabled,Tooltip="Убирает тени в игре"});
+Toggles.NoShadowEnabled:OnChanged(function()
+	v20.Enabled = Toggles.NoShadowEnabled.Value;
+	v22();
+	v0:Notify("No Shadow " .. ((v20.Enabled and "включён") or "выключен"));
+end);
+local v67 = v12.Visual:AddRightGroupbox("Jump Circle");
+v67:AddToggle("JumpCircleEnabled", {Text="Jump Circle",Default=v18.Enabled,Tooltip="Показывает круг при приземлении после прыжка"});
+Toggles.JumpCircleEnabled:OnChanged(function()
+	v18.Enabled = Toggles.JumpCircleEnabled.Value;
+	v0:Notify("Jump Circle " .. ((v18.Enabled and "включён") or "выключен"));
+end);
+v67:AddSlider("JumpCircleSize", {Text="Размер круга",Default=v18.CircleSize.X,Min=1,Max=20,Rounding=1,Tooltip="Размер круга (1-20)"});
+Options.JumpCircleSize:OnChanged(function()
+	v18.CircleSize = Vector3.new(Options.JumpCircleSize.Value, Options.JumpCircleSize.Value, v18.CircleSize.Z);
+end);
+v67:AddSlider("JumpCircleThickness", {Text="Толщина круга",Default=v18.CircleSize.Z,Min=0.1,Max=5,Rounding=1,Tooltip="Толщина круга (0.1-5)"});
+Options.JumpCircleThickness:OnChanged(function()
+	v18.CircleSize = Vector3.new(v18.CircleSize.X, v18.CircleSize.Y, Options.JumpCircleThickness.Value);
+end);
+v67:AddSlider("JumpCircleTransparency", {Text="Прозрачность",Default=v18.CircleTransparency,Min=0,Max=1,Rounding=2,Tooltip="Прозрачность круга (0-1)"});
+Options.JumpCircleTransparency:OnChanged(function()
+	v18.CircleTransparency = Options.JumpCircleTransparency.Value;
+end);
+v67:AddSlider("JumpCircleEffectTime", {Text="Время эффекта",Default=v18.EffectTime,Min=0.5,Max=5,Rounding=1,Tooltip="Время показа эффекта (0.5-5 сек)"});
+Options.JumpCircleEffectTime:OnChanged(function()
+	v18.EffectTime = Options.JumpCircleEffectTime.Value;
+end);
+v67:AddSlider("JumpCircleShrinkTime", {Text="Время сжатия",Default=v18.ShrinkTime,Min=0.1,Max=2,Rounding=1,Tooltip="Время сжатия круга (0.1-2 сек)"});
+Options.JumpCircleShrinkTime:OnChanged(function()
+	v18.ShrinkTime = Options.JumpCircleShrinkTime.Value;
+end);
+local v68 = v12.Visual:AddLeftGroupbox("Sky Settings");
+v68:AddToggle("SkyEnabled", {Text="Включить Cycles Sky",Default=v35.Enabled,Tooltip="Включает/выключает настройку неба"});
+Toggles.SkyEnabled:OnChanged(function()
+	v35.Enabled = Toggles.SkyEnabled.Value;
+	v0:Notify("Cycles Sky " .. ((v35.Enabled and "включён") or "выключен"));
+end);
+v68:AddDropdown("SkyCycleMode", {Text="Режим неба",Default=v35.CycleMode,Values=v35.AvailableCycles,Tooltip="Выберите стиль облаков и неба"});
+Options.SkyCycleMode:OnChanged(function()
+	v35.CycleMode = Options.SkyCycleMode.Value;
+	v0:Notify("Режим неба изменён на " .. v35.CycleMode);
+end);
+local v69 = v12.Visual:AddRightGroupbox("Crosshair");
+v69:AddToggle("CrosshairEnabled", {Text="Включить Crosshair",Default=v37.Enabled,Tooltip="Включает/выключает прицел"});
+Toggles.CrosshairEnabled:OnChanged(function()
+	v37.Enabled = Toggles.CrosshairEnabled.Value;
+	v0:Notify("Crosshair " .. ((v37.Enabled and "включён") or "выключен"));
+end);
+v69:AddDropdown("CrosshairType", {Text="Тип прицела",Default=v37.Type,Values=v37.AvailableTypes,Tooltip="Выберите стиль прицела"});
+Options.CrosshairType:OnChanged(function()
+	v37.Type = Options.CrosshairType.Value;
+end);
+v69:AddToggle("CrosshairRGB", {Text="RGB Crosshair",Default=v37.RGBEnabled,Tooltip="Включает RGB-эффект для прицела"});
+Toggles.CrosshairRGB:OnChanged(function()
+	v37.RGBEnabled = Toggles.CrosshairRGB.Value;
+end);
+v69:AddToggle("CrosshairSpin", {Text="Вращение Crosshair",Default=v37.SpinEnabled,Tooltip="Включает вращение прицела"});
+Toggles.CrosshairSpin:OnChanged(function()
+	v37.SpinEnabled = Toggles.CrosshairSpin.Value;
+end);
+v69:AddSlider("CrosshairSpinSpeed", {Text="Скорость вращения",Default=v37.SpinSpeed,Min=1,Max=10,Rounding=0,Tooltip="Настройка скорости вращения прицела"});
+Options.CrosshairSpinSpeed:OnChanged(function()
+	v37.SpinSpeed = Options.CrosshairSpinSpeed.Value;
+end);
+v69:AddSlider("CrosshairRainbowSpeed", {Text="Скорость радуги",Default=v37.RainbowSpeed,Min=0.1,Max=5,Rounding=1,Tooltip="Настройка скорости радуги прицела"});
+Options.CrosshairRainbowSpeed:OnChanged(function()
+	v37.RainbowSpeed = Options.CrosshairRainbowSpeed.Value;
+end);
+v69:AddSlider("CrosshairSize", {Text="Размер прицела",Default=v37.Size,Min=5,Max=30,Rounding=1,Tooltip="Настройка размера прицела"});
+Options.CrosshairSize:OnChanged(function()
+	v37.Size = Options.CrosshairSize.Value;
+end);
+v69:AddSlider("CrosshairThickness", {Text="Толщина прицела",Default=v37.Thickness,Min=1,Max=5,Rounding=1,Tooltip="Настройка толщины прицела"});
+Options.CrosshairThickness:OnChanged(function()
+	v37.Thickness = Options.CrosshairThickness.Value;
+end);
+local function v70()
+	if v6 then
+		if v17.ViewModelEnabled then
+			v6.FieldOfView = v17.FOV;
+		else
+			v6.FieldOfView = v7;
+		end
+	end
+end
+local v9 = 0;
+local function v71()
+	local v349 = Drawing.new("Text");
+	v349.Text = "simfoniaHUB";
+	v349.Color = Color3.fromRGB(255, 255, 255);
+	v349.Size = math.random(160, 260);
+	v349.Position = Vector2.new(math.random(0, v6.ViewportSize.X), math.random(0, v6.ViewportSize.Y));
+	v349.Transparency = 0.7;
+	v349.Visible = false;
+	v349.Font = Enum.Font.SourceSans;
+	local v358 = Vector2.new(math.random(-50, 50) / 10, math.random(-50, 50) / 10);
+	return {Object=v349,Velocity=v358};
+end
+local function v72(v359)
+	if (not v23.Enabled or not v23.MenuVisible) then
+		for v845, v846 in pairs(v8) do
+			v846.Object.Visible = false;
+		end
+		return;
+	end
+	while #v8 < 10 do
+		table.insert(v8, v71());
+	end
+	if v23.RGBEnabled then
+		v9 = v9 + v359;
+		local v738 = (math.sin(v9 * 2) * 127) + 128;
+		local v739 = (math.sin((v9 * 2) + 2) * 127) + 128;
+		local v740 = (math.sin((v9 * 2) + 4) * 127) + 128;
+		local v741 = Color3.fromRGB(v738, v739, v740);
+		for v848, v849 in pairs(v8) do
+			v849.Object.Color = v741;
+		end
+	else
+		for v851, v852 in pairs(v8) do
+			v852.Object.Color = Color3.fromRGB(255, 255, 255);
+		end
+	end
+	for v600, v601 in pairs(v8) do
+		v601.Object.Visible = true;
+		local v603 = v601.Object.Position + v601.Velocity;
+		local v604 = v6.ViewportSize.X;
+		local v605 = v6.ViewportSize.Y;
+		if ((v603.X < 0) or (v603.X > v604)) then
+			v601.Velocity = Vector2.new(-v601.Velocity.X, v601.Velocity.Y);
+			v603 = Vector2.new(math.clamp(v603.X, 0, v604), v603.Y);
+		end
+		if ((v603.Y < 0) or (v603.Y > v605)) then
+			v601.Velocity = Vector2.new(v601.Velocity.X, -v601.Velocity.Y);
+			v603 = Vector2.new(v603.X, math.clamp(v603.Y, 0, v605));
+		end
+		v601.Object.Position = v603;
+	end
+end
+local v73 = game:GetService("Lighting");
+local v74 = v73.Brightness;
+local v75 = v73.FogEnd;
+local function v76()
+	if v24.Enabled then
+		v73.Brightness = 2;
+		v73.FogEnd = 100000;
+		v73.ClockTime = 12;
+	else
+		v73.Brightness = v74;
+		v73.FogEnd = v75;
+	end
+end
+local function v77()
+	local v360 = v73:FindFirstChildOfClass("Sky");
+	if v26.Enabled then
+		if v360 then
+			v360:Destroy();
+		end
+		return;
+	end
+	if not v360 then
+		v360 = Instance.new("Sky", v73);
+	end
+	if v35.Enabled then
+		local v747 = v36[v35.CycleMode];
+		if v747 then
+			v360.SkyboxBk = v747.SkyboxBk;
+			v360.SkyboxDn = v747.SkyboxDn;
+			v360.SkyboxFt = v747.SkyboxFt;
+			v360.SkyboxLf = v747.SkyboxLf;
+			v360.SkyboxRt = v747.SkyboxRt;
+			v360.SkyboxUp = v747.SkyboxUp;
+		end
+	end
+end
+local function v78()
+	local v361 = v73:FindFirstChildOfClass("Sky");
+	if v26.Enabled then
+		if v361 then
+			v361:Destroy();
+		end
+	elseif not v361 then
+		Instance.new("Sky", v73);
+	end
+	if v25.Enabled then
+		v73.FogEnd = 100000;
+		v73.FogStart = 100000;
+		if v361 then
+			v361.CelestialBodiesShown = false;
+		end
+	else
+		v73.FogEnd = v75;
+		v73.FogStart = 0;
+		if v361 then
+			v361.CelestialBodiesShown = true;
+		end
+	end
+end
+local v79 = {};
+local v80 = 0;
+local function v81()
+	for v607, v608 in pairs(v79) do
+		v608:Remove();
+	end
+	v79 = {};
+	if not v37.Enabled then
+		return;
+	end
+	local v362, v363 = v6.ViewportSize.X / 2, v6.ViewportSize.Y / 2;
+	if (v37.Type == "DotCircle") then
+		local v752 = Drawing.new("Circle");
+		v752.Radius = v37.Size;
+		v752.Position = Vector2.new(v362, v363);
+		v752.Thickness = v37.Thickness;
+		v752.Color = Color3.fromRGB(255, 255, 255);
+		v752.Filled = false;
+		v752.Visible = true;
+		table.insert(v79, v752);
+		local v761 = Drawing.new("Circle");
+		v761.Radius = 2;
+		v761.Position = Vector2.new(v362, v363);
+		v761.Color = Color3.fromRGB(255, 255, 255);
+		v761.Filled = true;
+		v761.Visible = true;
+		table.insert(v79, v761);
+	elseif (v37.Type == "Cross") then
+		local v940 = Drawing.new("Line");
+		v940.From = Vector2.new(v362, v363 - v37.Size);
+		v940.To = Vector2.new(v362, v363 + v37.Size);
+		v940.Thickness = v37.Thickness;
+		v940.Color = Color3.fromRGB(255, 255, 255);
+		v940.Visible = true;
+		table.insert(v79, v940);
+		local v947 = Drawing.new("Line");
+		v947.From = Vector2.new(v362 - v37.Size, v363);
+		v947.To = Vector2.new(v362 + v37.Size, v363);
+		v947.Thickness = v37.Thickness;
+		v947.Color = Color3.fromRGB(255, 255, 255);
+		v947.Visible = true;
+		table.insert(v79, v947);
+	end
+end
+local function v82(v364)
+	if not v37.Enabled then
+		for v856, v857 in pairs(v79) do
+			v857.Visible = false;
+		end
+		return;
+	end
+	for v609, v610 in pairs(v79) do
+		v610.Visible = true;
+	end
+	if v37.RGBEnabled then
+		local v767 = tick();
+		local v768 = (math.sin(v767 * v37.RainbowSpeed) * 127) + 128;
+		local v769 = (math.sin((v767 * v37.RainbowSpeed) + 2) * 127) + 128;
+		local v770 = (math.sin((v767 * v37.RainbowSpeed) + 4) * 127) + 128;
+		local v771 = Color3.fromRGB(v768, v769, v770);
+		for v859, v860 in pairs(v79) do
+			v860.Color = v771;
+		end
+	else
+		for v862, v863 in pairs(v79) do
+			v863.Color = Color3.fromRGB(255, 255, 255);
+		end
+	end
+	if (v37.SpinEnabled and (v37.Type == "Cross")) then
+		v80 = v80 + (v37.SpinSpeed * v364);
+		local v772, v773 = v6.ViewportSize.X / 2, v6.ViewportSize.Y / 2;
+		local v774 = math.cos(v80);
+		local v775 = math.sin(v80);
+		local v776 = v79[1];
+		local v777 = v79[2];
+		v776.From = Vector2.new(v772 - (v37.Size * v774), v773 - (v37.Size * v775));
+		v776.To = Vector2.new(v772 + (v37.Size * v774), v773 + (v37.Size * v775));
+		v777.From = Vector2.new(v772 + (v37.Size * v775), v773 - (v37.Size * v774));
+		v777.To = Vector2.new(v772 - (v37.Size * v775), v773 + (v37.Size * v774));
+	end
+end
+Toggles.CrosshairEnabled:OnChanged(function()
+	v37.Enabled = Toggles.CrosshairEnabled.Value;
+	v81();
+end);
+Options.CrosshairType:OnChanged(function()
+	v37.Type = Options.CrosshairType.Value;
+	v81();
+end);
+local v4 = game:GetService("UserInputService");
+local v1 = game:GetService("RunService");
+local v2 = game:GetService("Players");
+local v3 = v2.LocalPlayer;
+local v83 = workspace.CurrentCamera;
+local v84 = 16;
+local v85 = {};
+local function v86()
+	local v369 = v3.Character;
+	if (not v369 or not v369:IsDescendantOf(workspace)) then
+		return nil, nil;
+	end
+	local v370 = v369:FindFirstChildOfClass("Humanoid");
+	local v371 = v369:FindFirstChild("HumanoidRootPart");
+	if (not v370 or not v371) then
+		return nil, nil;
+	end
+	return v370, v371;
+end
+local function v87()
+	local v372, v373 = v86();
+	if not v372 then
+		if v27.Enabled then
+			v27.Enabled = false;
+			Toggles.SpeedhackEnabled:SetValue(false);
+		end
+		return;
+	end
+	if (v27.Enabled and not getgenv().TpWalking and not getgenv().CframeEnabled) then
+		v372.WalkSpeed = v27.Speed;
+		v27.HasBeenDisabled = false;
+	elseif not v27.HasBeenDisabled then
+		v372.WalkSpeed = 16;
+		v27.HasBeenDisabled = true;
+	end
+end
+local function v70()
+	if not v6 then
+		return;
+	end
+	if v17.ViewModelEnabled then
+		v6.FieldOfView = v17.FOV;
+		v17.HasBeenDisabled = false;
+	elseif not v17.HasBeenDisabled then
+		v6.FieldOfView = 70;
+		v17.HasBeenDisabled = true;
+	end
+end
+local function v88()
+	local v374 = v3.Character;
+	if (not v374 or not v374:FindFirstChild("HumanoidRootPart")) then
+		return;
+	end
+	local v375 = v374.HumanoidRootPart;
+	if v34.Enabled then
+		v34.HasBeenDisabled = false;
+		local v789 = v375.Position;
+		local v790 = v375.CFrame.LookVector * 2;
+		local v791 = RaycastParams.new();
+		v791.FilterDescendantsInstances = {v374};
+		v791.FilterType = Enum.RaycastFilterType.Blacklist;
+		local v795 = workspace:Raycast(v789, v790, v791);
+		if v795 then
+			local v958 = Vector3.new(0, 1, 0);
+			if v4:IsKeyDown(Enum.KeyCode.W) then
+				v375.Velocity = v958 * v34.Speed;
+			elseif v4:IsKeyDown(Enum.KeyCode.S) then
+				v375.Velocity = v958 * -v34.Speed;
+			else
+				v375.Velocity = Vector3.new(0, 0, 0);
+			end
+		else
+			v375.Velocity = Vector3.new(v375.Velocity.X, v375.Velocity.Y, v375.Velocity.Z);
+		end
+	elseif not v34.HasBeenDisabled then
+		v375.Velocity = Vector3.new(0, 0, 0);
+		v34.HasBeenDisabled = true;
+	end
+end
+local v89 = Drawing.new("Line");
+v89.Thickness = 2;
+v89.Color = Color3.fromRGB(255, 0, 0);
+v89.Visible = false;
+local v93 = Drawing.new("Circle");
+v93.Thickness = 1;
+v93.NumSides = 64;
+v93.Radius = v38.FOVSize;
+v93.Filled = false;
+v93.Visible = false;
+local v100 = false;
+local function v101(v376)
+	if not v38.FOVEnabled then
+		return true;
+	end
+	local v377 = v4:GetMouseLocation();
+	local v378, v379 = v6:WorldToViewportPoint(v376);
+	if not v379 then
+		return false;
+	end
+	local v380 = (Vector2.new(v378.X, v378.Y) - v377).Magnitude;
+	return v380 <= v38.FOVSize;
+end
+local function v102(v381, v382)
+	if not v38.SkipWall then
+		return true;
+	end
+	local v383 = Ray.new(v381, (v382 - v381).Unit * (v382 - v381).Magnitude);
+	local v384 = workspace:FindPartOnRayWithIgnoreList(v383, {v3.Character});
+	return (v384 == nil) or v384:IsDescendantOf(v382.Parent);
+end
+local function v103()
+	local v385 = nil;
+	local v386 = math.huge;
+	local v387 = v3.Character and v3.Character:FindFirstChild("HumanoidRootPart");
+	if not v387 then
+		return nil;
+	end
+	local v388 = v4:GetMouseLocation();
+	for v612, v613 in pairs(v2:GetPlayers()) do
+		if ((v613 ~= v3) and v613.Character and v613.Character:FindFirstChild("Humanoid")) then
+			local v865 = v613.Character.Humanoid;
+			local v866 = ((v38.TargetPart == "Head") and v613.Character:FindFirstChild("Head")) or v613.Character:FindFirstChild("HumanoidRootPart");
+			if (v866 and (v865.Health > 0) and (not v38.FOVEnabled or v101(v866.Position))) then
+				local v999 = (v387.Position - v866.Position).Magnitude;
+				local v1000, v1001 = v6:WorldToViewportPoint(v866.Position);
+				if v1001 then
+					local v1047 = (Vector2.new(v1000.X, v1000.Y) - v388).Magnitude;
+					local v1048;
+					if (v38.Priority == "Nearest") then
+						v1048 = v999;
+					elseif (v38.Priority == "Farthest") then
+						v1048 = -v999;
+					elseif (v38.Priority == "Smart") then
+						v1048 = v1047;
+					end
+					if (v1048 < v386) then
+						v386 = v1048;
+						v385 = v866;
+					end
+				end
+			end
+		end
+	end
+	return v385;
+end
+local function v104()
+	if not v38.Enabled then
+		v89.Visible = false;
+		v93.Visible = false;
+		return;
+	end
+	v100 = Options.AimbotKeyPicker:GetState();
+	local v389 = v103();
+	if (v38.SnaplineEnabled and v389) then
+		local v798, v799 = v6:WorldToViewportPoint(v389.Position);
+		if v799 then
+			v89.From = v4:GetMouseLocation();
+			v89.To = Vector2.new(v798.X, v798.Y);
+			v89.Visible = true;
+		else
+			v89.Visible = false;
+		end
+	else
+		v89.Visible = false;
+	end
+	if (v100 and v389) then
+		local v801 = v389.Position;
+		local v802 = v6.CFrame.Position;
+		local v803 = (v801 - v802).Unit;
+		local v804 = CFrame.new(v802, v802 + v803);
+		local v805 = v38.Smoothness / 100;
+		v6.CFrame = v6.CFrame:Lerp(v804, v805);
+	end
+	local v390 = v4:GetMouseLocation();
+	v93.Position = v390;
+	v93.Radius = v38.FOVSize;
+	v93.Visible = v38.FOVEnabled;
+	if v38.FOVEnabled then
+		local v807 = (math.sin(tick() * 2) * 127) + 128;
+		local v808 = (math.sin((tick() * 2) + 2) * 127) + 128;
+		local v809 = (math.sin((tick() * 2) + 4) * 127) + 128;
+		v93.Color = Color3.fromRGB(v807, v808, v809);
+	end
+end
+local v105 = Drawing.new("Line");
+v105.Thickness = 2;
+v105.Color = Color3.fromRGB(0, 255, 255);
+v105.Visible = false;
+local v109 = Drawing.new("Circle");
+v109.Thickness = 1;
+v109.NumSides = 64;
+v109.Radius = v39.FOVSize;
+v109.Filled = false;
+v109.Visible = false;
+local v116 = false;
+local v117 = nil;
+local function v118(v396)
+	if not v39.FOVEnabled then
+		return true;
+	end
+	local v397 = v4:GetMouseLocation();
+	local v398, v399 = v6:WorldToViewportPoint(v396);
+	if not v399 then
+		return false;
+	end
+	local v400 = (Vector2.new(v398.X, v398.Y) - v397).Magnitude;
+	return v400 <= v39.FOVSize;
+end
+local function v119()
+	local v401 = nil;
+	local v402 = math.huge;
+	local v403 = v3.Character and v3.Character:FindFirstChild("HumanoidRootPart");
+	if not v403 then
+		return nil;
+	end
+	for v614, v615 in pairs(v2:GetPlayers()) do
+		if ((v615 ~= v3) and v615.Character and v615.Character:FindFirstChild("Humanoid")) then
+			local v867 = v615.Character.Humanoid;
+			local v868 = ((v39.TargetPart == "Head") and v615.Character:FindFirstChild("Head")) or v615.Character:FindFirstChild("HumanoidRootPart");
+			if (v868 and (v867.Health > 0) and v118(v868.Position)) then
+				local v1002 = (v403.Position - v868.Position).Magnitude;
+				if (v1002 < v402) then
+					v402 = v1002;
+					v401 = {Player=v615,Part=v868};
+				end
+			end
+		end
+	end
+	return v401;
+end
+local function v120()
+	if not v39.Enabled then
+		v105.Visible = false;
+		v109.Visible = false;
+		if v117 then
+			local v966 = v117.Player.Character and v117.Player.Character:FindFirstChild("HumanoidRootPart");
+			if (v966 and v117.OriginalCFrame) then
+				v966.CFrame = v117.OriginalCFrame;
+			end
+			v117 = nil;
+		end
+		return;
+	end
+	local v404 = v119();
+	local v405 = v116;
+	v116 = Options.SilentAimKeyPicker:GetState();
+	if (v39.SnaplineEnabled and v404) then
+		local v813, v814 = v6:WorldToViewportPoint(v404.Part.Position);
+		if v814 then
+			v105.From = v4:GetMouseLocation();
+			v105.To = Vector2.new(v813.X, v813.Y);
+			v105.Visible = true;
+		else
+			v105.Visible = false;
+		end
+	else
+		v105.Visible = false;
+	end
+	local v406 = v4:GetMouseLocation();
+	v109.Position = v406;
+	v109.Radius = v39.FOVSize;
+	v109.Visible = v39.FOVEnabled;
+	if (v116 and v404) then
+		local v816 = v3.Character and v3.Character:FindFirstChild("HumanoidRootPart");
+		if v816 then
+			if (not v117 or (v117.Player ~= v404.Player)) then
+				v117 = {Player=v404.Player,Part=v404.Part,OriginalCFrame=v404.Player.Character.HumanoidRootPart.CFrame};
+			end
+			local v971 = v6:ViewportPointToRay(v406.X, v406.Y);
+			local v972 = v971.Origin + (v971.Direction * 20);
+			local v973 = v404.Part.Position - v404.Player.Character.HumanoidRootPart.Position;
+			v404.Player.Character.HumanoidRootPart.CFrame = CFrame.new(v972 - v973);
+		end
+	elseif (v405 and not v116 and v117) then
+		local v975 = v117.Player.Character and v117.Player.Character:FindFirstChild("HumanoidRootPart");
+		if (v975 and v117.OriginalCFrame) then
+			v975.CFrame = v117.OriginalCFrame;
+		end
+		v117 = nil;
+	end
+end
+local function v121()
+	if not v40.Enabled then
+		for v869, v870 in pairs(v48) do
+			if v869.Character then
+				local v1003 = v869.Character:FindFirstChild(v870.PartName);
+				if v1003 then
+					v1003.Size = v870.Size;
+					v1003.Transparency = v870.Transparency;
+				end
+			end
+		end
+		v48 = {};
+		return;
+	end
+	for v616, v617 in pairs(v2:GetPlayers()) do
+		if ((v617 ~= v3) and v617.Character) then
+			local v871 = v617.Character:FindFirstChild(v40.TargetPart);
+			if (v871 and v871:IsA("BasePart")) then
+				if not v48[v617] then
+					v48[v617] = {Size=v871.Size,Transparency=v871.Transparency,PartName=v40.TargetPart};
+				end
+				v871.Size = Vector3.new(v40.Size, v40.Size, v40.Size);
+				v871.Transparency = v40.Transparency;
+			end
+		end
+	end
+end
+local function v122()
+end
+local function v123()
+	if v45.DeleteTextureEnabled then
+		for v872, v873 in pairs(workspace:GetDescendants()) do
+			if (v873:IsA("Texture") or v873:IsA("Decal")) then
+				v873:Destroy();
+			end
+			if v873:IsA("SurfaceGui") then
+				v873:Destroy();
+			end
+			if (v873:IsA("BasePart") and not v873:IsA("Terrain")) then
+				if not v47[v873] then
+					v47[v873] = {Material=v873.Material,Color=v873.Color};
+				end
+				v873.Material = Enum.Material.SmoothPlastic;
+				v873.Color = Color3.fromRGB(128, 128, 128);
+			end
+		end
+	else
+		for v874, v875 in pairs(v47) do
+			if (v874 and v874.Parent and v874:IsA("BasePart")) then
+				v874.Material = v875.Material;
+				v874.Color = v875.Color;
+			end
+		end
+		v47 = {};
+	end
+end
+local function v124()
+end
+Toggles.DeleteTextureEnabled:OnChanged(function()
+	v45.DeleteTextureEnabled = Toggles.DeleteTextureEnabled.Value;
+	v123();
+	v0:Notify("Delete Texture " .. ((v45.DeleteTextureEnabled and "включён") or "выключен"));
+end);
+local function v125()
+	if (v43.Enabled and v3.Character) then
+		local v817 = v3.Character:FindFirstChild("HumanoidRootPart");
+		if v817 then
+			local v976 = math.random(0, 360);
+			v817.CFrame = CFrame.new(v817.Position) * CFrame.Angles(0, math.rad(v976), 0);
+		end
+	end
+end
+local function v126()
+	if not v3.Character then
+		return;
+	end
+	local v414 = v3.Character;
+	local v415 = v414:FindFirstChild("HumanoidRootPart");
+	local v416 = v414:FindFirstChild("Humanoid");
+	if (not v415 or not v416) then
+		return;
+	end
+	v44.CameraEnabled = true;
+	v44.Yaw = 0;
+	v44.Pitch = 0;
+	for v618, v619 in pairs(v44.Connections) do
+		if v619 then
+			v619:Disconnect();
+		end
+	end
+	v44.Connections = {};
+	v4.MouseBehavior = Enum.MouseBehavior.LockCenter;
+	v4.MouseIconEnabled = false;
+	v6.CameraType = Enum.CameraType.Scriptable;
+	local v426 = v4.InputChanged:Connect(function(v620)
+		if ((v620.UserInputType == Enum.UserInputType.MouseMovement) and v44.CameraEnabled) then
+			v44.Yaw = v44.Yaw - (v620.Delta.X * v44.Sensitivity);
+			v44.Pitch = math.clamp(v44.Pitch - (v620.Delta.Y * v44.Sensitivity), -80, 80);
+		end
+	end);
+	table.insert(v44.Connections, v426);
+	local v427 = v1.RenderStepped:Connect(function()
+		if (not v44.CameraEnabled or not v44.Enabled) then
+			return;
+		end
+		if (v415 and v414:FindFirstChild("Humanoid")) then
+			local v878 = v415.Position + Vector3.new(0, v44.Height, 0);
+			local v879 = CFrame.Angles(0, math.rad(v44.Yaw), 0) * CFrame.Angles(math.rad(v44.Pitch), 0, 0);
+			local v880 = v879:VectorToWorldSpace(Vector3.new(0, 0, v44.Distance));
+			local v881 = v878 + v880;
+			v6.CFrame = CFrame.new(v881, v878);
+		end
+	end);
+	table.insert(v44.Connections, v427);
+	local v428 = v416.Died:Connect(function()
+		deactivateThirdPerson();
+	end);
+	table.insert(v44.Connections, v428);
+end
+local function v127()
+	v44.CameraEnabled = false;
+	v6.CameraType = Enum.CameraType.Custom;
+	v4.MouseBehavior = Enum.MouseBehavior.Default;
+	v4.MouseIconEnabled = true;
+	for v621, v622 in pairs(v44.Connections) do
+		if v622 then
+			v622:Disconnect();
+		end
+	end
+	v44.Connections = {};
+end
+local function v128()
+	if (v44.Enabled and not v44.CameraEnabled) then
+		v126();
+	elseif (not v44.Enabled and v44.CameraEnabled) then
+		v127();
+	end
+end
+local v129 = v3.CharacterAdded:Connect(function(v436)
+	if v44.Enabled then
+		task.wait(0.1);
+		v126();
+	end
+end);
+v3.CharacterAdded:Connect(function(v437)
+	if getgenv().CframeEnabled then
+		task.spawn(function()
+			local v883 = game:GetService("Players");
+			local v884 = game:GetService("RunService");
+			local v885 = v883.LocalPlayer;
+			local v886 = v437;
+			local v887 = v886:WaitForChild("HumanoidRootPart");
+			while getgenv().CframeEnabled do
+				v884.RenderStepped:Wait();
+				if (v886 and v886:FindFirstChild("HumanoidRootPart")) then
+					local v1031 = v886.Humanoid.MoveDirection;
+					if (v1031.Magnitude > 0) then
+						v886.HumanoidRootPart.CFrame = v886.HumanoidRootPart.CFrame + ((v1031 * getgenv().CframeSpeed) / 10);
+					end
+				end
+			end
+		end);
+	end
+end);
+local function v130()
+	local v438 = v3.Character;
+	if (not v438 or not v438:FindFirstChild("HumanoidRootPart") or not v438:FindFirstChild("Humanoid")) then
+		return;
+	end
+	local v439 = v438.HumanoidRootPart;
+	local v440 = v438.Humanoid;
+	if v32.Enabled then
+		v440.PlatformStand = true;
+		if ((v440:GetState() == Enum.HumanoidStateType.Jumping) or (v440:GetState() == Enum.HumanoidStateType.Freefall)) then
+			v440:ChangeState(Enum.HumanoidStateType.Running);
+		end
+		local v819 = Vector3.new();
+		if v4:IsKeyDown(Enum.KeyCode.W) then
+			v819 = v819 + v6.CFrame.LookVector;
+		end
+		if v4:IsKeyDown(Enum.KeyCode.S) then
+			v819 = v819 - v6.CFrame.LookVector;
+		end
+		if v4:IsKeyDown(Enum.KeyCode.A) then
+			v819 = v819 - v6.CFrame.RightVector;
+		end
+		if v4:IsKeyDown(Enum.KeyCode.D) then
+			v819 = v819 + v6.CFrame.RightVector;
+		end
+		if v4:IsKeyDown(Enum.KeyCode.Space) then
+			v819 = v819 + Vector3.new(0, 1, 0);
+		end
+		if v4:IsKeyDown(Enum.KeyCode.LeftControl) then
+			v819 = v819 - Vector3.new(0, 1, 0);
+		end
+		if (v819.Magnitude > 0) then
+			v819 = v819.Unit;
+			v439.Velocity = v819 * v32.Speed;
+		else
+			v439.Velocity = Vector3.new(0, 0, 0);
+		end
+	else
+		v440.PlatformStand = false;
+		v439.Velocity = Vector3.new(v439.Velocity.X, v439.Velocity.Y, v439.Velocity.Z);
+	end
+end
+v4.JumpRequest:Connect(function()
+	if v33.Enabled then
+		v3.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping");
+	end
+end);
+local v131 = nil;
+local v132 = nil;
+local v133 = "HumanoidRootPart";
+function noclip()
+	v132 = false;
+	local function v441()
+		if ((v132 == false) and (v3.Character ~= nil)) then
+			for v981, v982 in pairs(v3.Character:GetDescendants()) do
+				if (v982:IsA("BasePart") and v982.CanCollide and (v982.Name ~= v133)) then
+					v982.CanCollide = false;
+				end
+			end
+		end
+		wait(0.21);
+	end
+	v131 = v1.Stepped:Connect(v441);
+end
+function clip()
+	if v131 then
+		v131:Disconnect();
+	end
+	v132 = true;
+end
+Toggles.NoclipEnabled:OnChanged(function()
+	v46.Enabled = Toggles.NoclipEnabled.Value;
+	if v46.Enabled then
+		noclip();
+	else
+		clip();
+	end
+	v0:Notify("Noclip " .. ((v46.Enabled and "включён") or "выключен"));
+end);
+local v134;
+v134 = hookmetamethod(game, "__newindex", function(v444, v445, v446)
+	if ((v444 == v6) and (v445 == "CFrame")) then
+		if v17.AspectRatioEnabled then
+			v446 = v446 * CFrame.new(0, 0, 0, 1, 0, 0, 0, v17.AspectRatioValue, 0, 0, 0, 1);
+		end
+	end
+	return v134(v444, v445, v446);
+end);
+local function v135()
+	local v447 = Instance.new("Model");
+	v447.Name = "JumpEffect";
+	local v449 = Instance.new("Part");
+	v449.Name = "Circle";
+	v449.Anchored = true;
+	v449.CanCollide = false;
+	v449.Color = v18.CircleColor;
+	v449.Material = Enum.Material.Plastic;
+	v449.Transparency = v18.CircleTransparency;
+	v449.Size = Vector3.new(1, 1, 1);
+	local v460 = Instance.new("SpecialMesh");
+	v460.MeshType = Enum.MeshType.FileMesh;
+	v460.MeshId = "rbxassetid://3270017";
+	v460.Scale = Vector3.new(1, 0.05, 1);
+	v460.Parent = v449;
+	v449.Parent = v447;
+	v447.PrimaryPart = v449;
+	v447.Parent = workspace;
+end
+local function v136(v469, v470)
+	local v471 = v5:Create(v470, TweenInfo.new(v18.ShrinkTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale=Vector3.new(0.1, 0.05, 0.1)});
+	local v472 = v5:Create(v469, TweenInfo.new(v18.ShrinkTime), {Transparency=1});
+	v471:Play();
+	v472:Play();
+	v471.Completed:Wait();
+	v469.Parent:Destroy();
+end
+local function v137(v473)
+	local v474 = v473:WaitForChild("Humanoid");
+	local v475 = v473:WaitForChild("HumanoidRootPart");
+	local v476 = workspace:FindFirstChild("JumpEffect");
+	v474.StateChanged:Connect(function(v623, v624)
+		if ((v624 == Enum.HumanoidStateType.Landed) and v18.Enabled and v476) then
+			local v888 = v476:Clone();
+			local v889 = v888.PrimaryPart;
+			local v890 = v889:FindFirstChildOfClass("SpecialMesh");
+			v889.Color = v18.CircleColor;
+			v889.Transparency = v18.CircleTransparency;
+			v889.Material = Enum.Material.Plastic;
+			v888.Parent = workspace;
+			local v898 = v475.Size.Y / 1.4;
+			local v899 = v18.CircleSize.Y / 2;
+			local v900 = (v475.Position.Y - v898) - v899;
+			v889.CFrame = CFrame.new(v475.Position.X, v900, v475.Position.Z) * CFrame.Angles(math.rad(90), 0, 0);
+			v890.Scale = Vector3.new(0.1, v18.CircleSize.Y, 0.1);
+			v5:Create(v890, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale=v18.CircleSize}):Play();
+			task.delay(v18.EffectTime, function()
+				if (v888 and v888.Parent) then
+					v136(v889, v890);
+				end
+			end);
+		end
+	end);
+end
+v4.InputBegan:Connect(function(v477, v478)
+	if v478 then
+		return;
+	end
+	if (v477.KeyCode == Enum.KeyCode.RightShift) then
+		v23.MenuVisible = not v23.MenuVisible;
+	end
+end);
+spawn(function()
+	while true do
+		task.wait(0.1);
+		v125();
+	end
+end);
+v1.RenderStepped:Connect(function(v479)
+	v70();
+	v72(v479);
+	v76();
+	v77();
+	v104();
+	v120();
+	v121();
+	v122();
+	v124();
+	v87();
+	v88();
+	v130();
+	v128();
+	v82(v479);
+end);
+local function v138()
+	local v480 = game:GetService("TextChatService");
+	local v481 = v480:FindFirstChild("TextChannels");
+	if not v481 then
+		return;
+	end
+	local v482 = v481:FindFirstChild("RBXGeneral") or v481:FindFirstChild("RBXSystem");
+	if not v482 then
+		return;
+	end
+	local function v483(v625)
+		if not v41.Enabled then
+			return;
+		end
+		if (not v625.TextSource or (v625.TextSource.UserId ~= v3.UserId)) then
+			return;
+		end
+		local v626 = v625.Text:lower();
+		if (v626 == "/helps") then
+			local v903 = Instance.new("ScreenGui");
+			v903.Parent = game:GetService("CoreGui");
+			local v905 = Instance.new("TextLabel");
+			v905.Size = UDim2.new(0, 400, 0, 50);
+			v905.Position = UDim2.new(0.5, -200, 0.5, -25);
+			v905.BackgroundTransparency = 0.5;
+			v905.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+			v905.Text = "SIM AI: Список команд: /DEXv4, /INFyeld, /unhook";
+			v905.TextColor3 = Color3.fromRGB(128, 0, 128);
+			v905.TextScaled = true;
+			v905.Parent = v903;
+			task.spawn(function()
+				task.wait(5);
+				v903:Destroy();
+			end);
+		elseif (v626 == "/dexv4") then
+			pcall(function()
+				loadstring(game:HttpGet("https://www.roblox.com/games/11433785951/Mason-Tech-Power-Core-Reopened", true))();
+			end);
+			local v1014 = Instance.new("ScreenGui");
+			v1014.Parent = game:GetService("CoreGui");
+			local v1016 = Instance.new("TextLabel");
+			v1016.Size = UDim2.new(0, 400, 0, 50);
+			v1016.Position = UDim2.new(0.5, -200, 0.5, -25);
+			v1016.BackgroundTransparency = 0.5;
+			v1016.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+			v1016.Text = "SIM AI: DEXv4 запущен!";
+			v1016.TextColor3 = Color3.fromRGB(128, 0, 128);
+			v1016.TextScaled = true;
+			v1016.Parent = v1014;
+			task.spawn(function()
+				task.wait(3);
+				v1014:Destroy();
+			end);
+		elseif (v626 == "/infyeld") then
+			pcall(function()
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))();
+			end);
+			local v1055 = Instance.new("ScreenGui");
+			v1055.Parent = game:GetService("CoreGui");
+			local v1057 = Instance.new("TextLabel");
+			v1057.Size = UDim2.new(0, 400, 0, 50);
+			v1057.Position = UDim2.new(0.5, -200, 0.5, -25);
+			v1057.BackgroundTransparency = 0.5;
+			v1057.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+			v1057.Text = "SIM AI: Infinite Yield запущен!";
+			v1057.TextColor3 = Color3.fromRGB(128, 0, 128);
+			v1057.TextScaled = true;
+			v1057.Parent = v1055;
+			task.spawn(function()
+				task.wait(3);
+				v1055:Destroy();
+			end);
+		elseif (v626 == "/unhook") then
+			for v1115, v1116 in pairs(Toggles) do
+				v1116:SetValue(false);
+			end
+			v0:Unload();
+			local v1104 = Instance.new("ScreenGui");
+			v1104.Parent = game:GetService("CoreGui");
+			local v1106 = Instance.new("TextLabel");
+			v1106.Size = UDim2.new(0, 400, 0, 50);
+			v1106.Position = UDim2.new(0.5, -200, 0.5, -25);
+			v1106.BackgroundTransparency = 0.5;
+			v1106.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+			v1106.Text = "SIM AI: Все функции и чит-меню отключены.";
+			v1106.TextColor3 = Color3.fromRGB(128, 0, 128);
+			v1106.TextScaled = true;
+			v1106.Parent = v1104;
+			task.spawn(function()
+				task.wait(3);
+				v1104:Destroy();
+			end);
+		end
+	end
+	v482.MessageReceived:Connect(v483);
+end
+v138();
+local v2 = game:GetService("Players");
+local v1 = game:GetService("RunService");
+local v139 = game:GetService("CoreGui");
+local v3 = v2.LocalPlayer;
+local v6 = workspace.CurrentCamera or workspace:WaitForChild("CurrentCamera");
+local function v140(v484)
+	if not v484 then
+		return "None";
+	end
+	for v627, v628 in pairs(v484:GetChildren()) do
+		if v628:IsA("Tool") then
+			return v628.Name;
+		end
+	end
+	return "None";
+end
+local v141 = {};
+local function v142(v485)
+	local v486 = {ScreenGui=nil,TopLine=nil,BottomLine=nil,LeftLine=nil,RightLine=nil,HealthBar=nil,HealthBarOutline=nil,NameLabel=nil};
+	local function v487()
+		if v486.ScreenGui then
+			v486.ScreenGui:Destroy();
+		end
+		if (v485 == v3) then
+			return;
+		end
+		local v629 = v485.Character;
+		if not v629 then
+			return;
+		end
+		local v630 = v629:WaitForChild("HumanoidRootPart", 5);
+		local v631 = v629:WaitForChild("Humanoid", 5);
+		if (not v630 or not v631) then
+			return;
+		end
+		v486.ScreenGui = Instance.new("ScreenGui");
+		v486.ScreenGui.Name = "PlayerESP_" .. v485.Name;
+		v486.ScreenGui.Parent = v139;
+		v486.ScreenGui.IgnoreGuiInset = true;
+		v486.TopLine = Instance.new("Frame");
+		v486.TopLine.BackgroundColor3 = v58.BoxColor;
+		v486.TopLine.BorderSizePixel = 0;
+		v486.TopLine.Parent = v486.ScreenGui;
+		v486.BottomLine = Instance.new("Frame");
+		v486.BottomLine.BackgroundColor3 = v58.BoxColor;
+		v486.BottomLine.BorderSizePixel = 0;
+		v486.BottomLine.Parent = v486.ScreenGui;
+		v486.LeftLine = Instance.new("Frame");
+		v486.LeftLine.BackgroundColor3 = v58.BoxColor;
+		v486.LeftLine.BorderSizePixel = 0;
+		v486.LeftLine.Parent = v486.ScreenGui;
+		v486.RightLine = Instance.new("Frame");
+		v486.RightLine.BackgroundColor3 = v58.BoxColor;
+		v486.RightLine.BorderSizePixel = 0;
+		v486.RightLine.Parent = v486.ScreenGui;
+		v486.HealthBarOutline = Instance.new("Frame");
+		v486.HealthBarOutline.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+		v486.HealthBarOutline.BorderSizePixel = 0;
+		v486.HealthBarOutline.Parent = v486.ScreenGui;
+		v486.HealthBar = Instance.new("Frame");
+		v486.HealthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0);
+		v486.HealthBar.BorderSizePixel = 0;
+		v486.HealthBar.Parent = v486.ScreenGui;
+		v486.NameLabel = Instance.new("TextLabel");
+		v486.NameLabel.BackgroundTransparency = 1;
+		v486.NameLabel.TextColor3 = v58.NamesColor;
+		v486.NameLabel.TextStrokeTransparency = (v58.NamesOutline and 0) or 1;
+		v486.NameLabel.TextStrokeColor3 = v58.NamesOutlineColor;
+		v486.NameLabel.TextSize = v58.NamesSize;
+		v486.NameLabel.Font = v58.NamesFont;
+		v486.NameLabel.TextWrapped = true;
+		v486.NameLabel.TextXAlignment = Enum.TextXAlignment.Center;
+		v486.NameLabel.Parent = v486.ScreenGui;
+		v141[v485] = v486;
+		local v677;
+		v677 = v1.RenderStepped:Connect(function()
+			if (v485.Character and v485.Character.Parent and v485.Character:FindFirstChild("HumanoidRootPart") and v485.Character:FindFirstChild("Humanoid") and (v485.Character.Humanoid.Health > 0) and v485.Character:FindFirstChild("Head")) then
+				local v983, v984 = v6:WorldToViewportPoint(v485.Character.HumanoidRootPart.Position);
+				local v985 = (1 / (v983.Z * math.tan(math.rad(v6.FieldOfView * 0.5)) * 2)) * 100;
+				local v986, v987 = math.floor(40 * v985), math.floor(60 * v985);
+				if (v984 and v58.Enabled) then
+					if v58.Box then
+						v486.TopLine.Size = UDim2.new(0, v986, 0, 1);
+						v486.TopLine.Position = UDim2.new(0, v983.X - (v986 / 2), 0, v983.Y - (v987 / 2));
+						v486.TopLine.BackgroundColor3 = v58.BoxColor;
+						v486.TopLine.Visible = true;
+						v486.BottomLine.Size = UDim2.new(0, v986, 0, 1);
+						v486.BottomLine.Position = UDim2.new(0, v983.X - (v986 / 2), 0, (v983.Y + (v987 / 2)) - 1);
+						v486.BottomLine.BackgroundColor3 = v58.BoxColor;
+						v486.BottomLine.Visible = true;
+						v486.LeftLine.Size = UDim2.new(0, 1, 0, v987);
+						v486.LeftLine.Position = UDim2.new(0, v983.X - (v986 / 2), 0, v983.Y - (v987 / 2));
+						v486.LeftLine.BackgroundColor3 = v58.BoxColor;
+						v486.LeftLine.Visible = true;
+						v486.RightLine.Size = UDim2.new(0, 1, 0, v987);
+						v486.RightLine.Position = UDim2.new(0, (v983.X + (v986 / 2)) - 1, 0, v983.Y - (v987 / 2));
+						v486.RightLine.BackgroundColor3 = v58.BoxColor;
+						v486.RightLine.Visible = true;
+					else
+						v486.TopLine.Visible = false;
+						v486.BottomLine.Visible = false;
+						v486.LeftLine.Visible = false;
+						v486.RightLine.Visible = false;
+					end
+					if v58.HealthBar then
+						v486.HealthBarOutline.Visible = true;
+						v486.HealthBar.Visible = true;
+						local v1093 = v485.Character.Humanoid.Health / v485.Character.Humanoid.MaxHealth;
+						v486.HealthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0):Lerp(Color3.fromRGB(0, 255, 0), v1093);
+						if (v58.HealthBarSide == "Left") then
+							v486.HealthBarOutline.Size = UDim2.new(0, 2, 0, v987);
+							v486.HealthBarOutline.Position = UDim2.new(0, (v983.X - (v986 / 2)) - 3, 0, v983.Y - (v987 / 2));
+							v486.HealthBar.Size = UDim2.new(0, 1, 0, -(v987 - 2) * v1093);
+							v486.HealthBar.Position = v486.HealthBarOutline.Position + UDim2.new(0, 1, 0, v987 - 1);
+						elseif (v58.HealthBarSide == "Bottom") then
+							v486.HealthBarOutline.Size = UDim2.new(0, v986, 0, 3);
+							v486.HealthBarOutline.Position = UDim2.new(0, v983.X - (v986 / 2), 0, v983.Y + (v987 / 2) + 2);
+							v486.HealthBar.Size = UDim2.new(0, (v986 - 2) * v1093, 0, 1);
+							v486.HealthBar.Position = v486.HealthBarOutline.Position + UDim2.new(0, 1, 0, 1);
+						elseif (v58.HealthBarSide == "Right") then
+							v486.HealthBarOutline.Size = UDim2.new(0, 2, 0, v987);
+							v486.HealthBarOutline.Position = UDim2.new(0, v983.X + (v986 / 2) + 1, 0, v983.Y - (v987 / 2));
+							v486.HealthBar.Size = UDim2.new(0, 1, 0, -(v987 - 2) * v1093);
+							v486.HealthBar.Position = v486.HealthBarOutline.Position + UDim2.new(0, 1, 0, v987 - 1);
+						end
+					else
+						v486.HealthBar.Visible = false;
+						v486.HealthBarOutline.Visible = false;
+					end
+					if (v58.Names or v58.HeldItem or v58.Distance) then
+						local v1097 = "";
+						if v58.Names then
+							v1097 = v1097 .. v485.Name .. "\n";
+						end
+						if v58.Distance then
+							v1097 = v1097 .. math.floor((v6.CFrame.Position - v485.Character.HumanoidRootPart.Position).Magnitude) .. "m\n";
+						end
+						if v58.HeldItem then
+							local v1121 = v140(v485.Character);
+							v1097 = v1097 .. v1121;
+						end
+						v486.NameLabel.Text = v1097;
+						v486.NameLabel.Position = UDim2.new(0, v983.X, 0, v983.Y + (v987 / 2) + math.floor(2 * v985));
+						v486.NameLabel.Size = UDim2.new(0, v986 * 2, 0, v987);
+						v486.NameLabel.TextScaled = true;
+						v486.NameLabel.Visible = true;
+					else
+						v486.NameLabel.Visible = false;
+					end
+				else
+					v486.TopLine.Visible = false;
+					v486.BottomLine.Visible = false;
+					v486.LeftLine.Visible = false;
+					v486.RightLine.Visible = false;
+					v486.HealthBar.Visible = false;
+					v486.HealthBarOutline.Visible = false;
+					v486.NameLabel.Visible = false;
+				end
+			else
+				v486.TopLine.Visible = false;
+				v486.BottomLine.Visible = false;
+				v486.LeftLine.Visible = false;
+				v486.RightLine.Visible = false;
+				v486.HealthBar.Visible = false;
+				v486.HealthBarOutline.Visible = false;
+				v486.NameLabel.Visible = false;
+				if (not v485 or not v485.Parent) then
+					if v486.ScreenGui then
+						v486.ScreenGui:Destroy();
+					end
+					v141[v485] = nil;
+					if v677 then
+						v677:Disconnect();
+					end
+				end
+			end
+		end);
+	end
+	if v485.Character then
+		v487();
+	end
+	v485.CharacterAdded:Connect(v487);
+end
+for v488, v489 in pairs(v2:GetPlayers()) do
+	if (v489 ~= v3) then
+		v142(v489);
+	end
+end
+v2.PlayerAdded:Connect(function(v490)
+	if (v490 ~= v3) then
+		v142(v490);
+	end
+end);
+v2.PlayerRemoving:Connect(function(v491)
+	if v141[v491] then
+		if v141[v491].ScreenGui then
+			v141[v491].ScreenGui:Destroy();
+		end
+		v141[v491] = nil;
+	end
+end);
+v0:SetWatermarkVisibility(true);
+local v143 = tick();
+local v144 = 0;
+local v145 = 60;
+local v146 = game:GetService("RunService").RenderStepped:Connect(function()
+	v144 += 1
+	if ((tick() - v143) >= 1) then
+		v145 = v144;
+		v143 = tick();
+		v144 = 0;
+	end
+	v0:SetWatermark(("simfonia v4 re-build | %s fps | %s ms"):format(math.floor(v145), math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())));
+end);
+v0.KeybindFrame.Visible = true;
+if not workspace:FindFirstChild("JumpEffect") then
+	v135();
+end
+v3.CharacterAdded:Connect(v137);
+if v3.Character then
+	v137(v3.Character);
+end
+v14:SetLibrary(v0);
+v14:ApplyToTab(v12.Settings);
+v15:SetLibrary(v0);
+v15.IgnoreIndexes = v15.IgnoreIndexes or {};
+v15:ApplyToTab(v12.Settings);
+return v58;
