@@ -1,0 +1,1036 @@
+local Pls = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RS = game:GetService("RunService")
+local Plr = Pls.LocalPlayer
+local UIsafe = gethui() or game:GetService("CoreGui") --or Plr:WaitForChild("PlayerGui") -- only for tests in roblox studio
+local PG = 
+
+local T = {
+	Bg = Color3.fromRGB(15, 15, 15),
+	BgA = Color3.fromRGB(25, 25, 25),
+	Hdr = Color3.fromRGB(20, 20, 20),
+	Bdr = Color3.fromRGB(50, 50, 50),
+	Sec = Color3.fromRGB(22, 22, 22),
+	Acc = Color3.fromRGB(90, 90, 90),
+	AccR = Color3.fromRGB(255, 255, 255),
+	AccG = Color3.fromRGB(211, 211, 211),
+	Txt = Color3.fromRGB(255, 255, 255),
+	TxD = Color3.fromRGB(200, 200, 200),
+	Btn = Color3.fromRGB(35, 35, 35),
+	BtH = Color3.fromRGB(45, 45, 45),
+	BtA = Color3.fromRGB(55, 55, 55),
+	Tgl = Color3.fromRGB(40, 40, 40),
+	TgE = Color3.fromRGB(180, 60, 60), 
+	TgD = Color3.fromRGB(50, 50, 50), 
+	Sld = Color3.fromRGB(30, 30, 30),
+	SlF = Color3.fromRGB(180, 60, 60),
+}
+
+local function CI(c, p)
+	local i = Instance.new(c)
+	for k, v in pairs(p) do i[k] = v end
+	return i
+end
+
+local Lib = {}
+Lib.__index = Lib
+
+local KBL = {}
+
+function Lib.new(o)
+	local s = setmetatable({}, Lib)
+	o = o or {}
+
+	s.Tbs = {}
+	s.CTb = nil
+	s.Vis = true
+	s.Sz = o.Size or UDim2.new(0, 700, 0, 550)
+	s.Ttl = o.Title or ""
+
+	s.SG = CI("ScreenGui", {
+		Name = "CG",
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		Parent = PG
+	})
+
+	s.MF = CI("Frame", {
+		Name = "MF",
+		Size = s.Sz,
+		Position = UDim2.new(0.5, -s.Sz.X.Offset/2, 0.5, -s.Sz.Y.Offset/2),
+		BackgroundColor3 = T.Bg,
+		BorderSizePixel = 1,
+		BorderColor3 = T.Bdr,
+		Parent = s.SG
+	})
+
+	s.Hdr = CI("Frame", {
+		Name = "Hdr",
+		Size = UDim2.new(1, 0, 0, 24),
+		BackgroundColor3 = T.Hdr,
+		BorderSizePixel = 0,
+		Parent = s.MF
+	})
+
+	CI("Frame", {
+		Size = UDim2.new(1, 0, 0, 1),
+		Position = UDim2.new(0, 0, 1, -1),
+		BackgroundColor3 = T.Bdr,
+		BorderSizePixel = 0,
+		Parent = s.Hdr
+	})
+
+	CI("TextLabel", {
+		Size = UDim2.new(1, -10, 1, 0),
+		Position = UDim2.new(0, 8, 0, 0),
+		BackgroundTransparency = 1,
+		Text = s.Ttl,
+		TextColor3 = T.AccR,
+		TextSize = 12,
+		Font = Enum.Font.Code,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = s.Hdr
+	})
+
+	s.TC = CI("Frame", {
+		Name = "TC",
+		Size = UDim2.new(0, 140, 1, -34),
+		Position = UDim2.new(0, 5, 0, 29),
+		BackgroundColor3 = T.BgA,
+		BorderSizePixel = 1,
+		BorderColor3 = T.Bdr,
+		Parent = s.MF
+	})
+
+	CI("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 2),
+		Parent = s.TC
+	})
+
+	CI("UIPadding", {
+		PaddingTop = UDim.new(0, 4),
+		PaddingLeft = UDim.new(0, 4),
+		PaddingRight = UDim.new(0, 4),
+		Parent = s.TC
+	})
+
+	s.CC = CI("Frame", {
+		Name = "CC",
+		Size = UDim2.new(1, -160, 1, -34),
+		Position = UDim2.new(0, 150, 0, 29),
+		BackgroundColor3 = T.BgA,
+		BackgroundTransparency = 0.5,
+		BorderSizePixel = 1,
+		BorderColor3 = T.Bdr,
+		Parent = s.MF
+	})
+
+	s:MD()
+
+	UIS.InputBegan:Connect(function(i, p)
+		if not p and i.KeyCode == Enum.KeyCode.Insert then
+			s.Vis = not s.Vis
+			s.MF.Visible = s.Vis
+		end
+	end)
+
+	return s
+end
+
+function Lib:CW(o)
+	o = o or {}
+	local txt = o.Text or "WATERMARK"
+	local sz = o.Size or UDim2.new(0, 220, 0, 26)
+	local pos = o.Position or UDim2.new(0, 10, 0, 10)
+
+	self.WM = CI("Frame", {
+		Name = "WM",
+		Size = sz,
+		Position = pos,
+		BackgroundColor3 = T.Bg,
+		BorderSizePixel = 1,
+		BorderColor3 = T.Bdr,
+		Parent = self.SG
+	})
+
+	self.WMT = CI("TextLabel", {
+		Size = UDim2.new(1, -10, 1, 0),
+		Position = UDim2.new(0, 5, 0, 0),
+		BackgroundTransparency = 1,
+		Text = txt .. " | FPS: 60",
+		TextColor3 = T.AccR,
+		TextSize = 11,
+		Font = Enum.Font.Code,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = self.WM
+	})
+
+	self:MWD()
+
+	local bt = txt
+	spawn(function()
+		while wait(0.5) do
+			if self.WMT and self.WMT.Parent then
+				local fps = math.floor(1 / RS.RenderStepped:Wait())
+				local png = math.floor(Plr:GetNetworkPing() * 1000)
+				self.WMT.Text = bt .. " | FPS: " .. fps .. " | " .. png .. "ms"
+			end
+		end
+	end)
+
+	return self.WM
+end
+
+function Lib:MWD()
+	if not self.WM then return end
+	local dg, ds, sp = false, nil, nil
+
+	self.WM.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
+			dg = true
+			ds = i.Position
+			sp = self.WM.Position
+		end
+	end)
+
+	self.WM.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then dg = false end
+	end)
+
+	UIS.InputChanged:Connect(function(i)
+		if dg and i.UserInputType == Enum.UserInputType.MouseMovement then
+			local d = i.Position - ds
+			self.WM.Position = UDim2.new(sp.X.Scale, sp.X.Offset + d.X, sp.Y.Scale, sp.Y.Offset + d.Y)
+		end
+	end)
+end
+
+function Lib:CKL(o)
+	o = o or {}
+	local sz = o.Size or UDim2.new(0, 160, 0, 140)
+	local pos = o.Position or UDim2.new(1, -170, 0, 10)
+	local vis = o.Visible ~= false
+
+	self.KLF = CI("Frame", {
+		Name = "KL",
+		Size = sz,
+		Position = pos,
+		BackgroundColor3 = T.Bg,
+		BorderSizePixel = 1,
+		BorderColor3 = T.Bdr,
+		Visible = vis,
+		Parent = self.SG
+	})
+
+	CI("TextLabel", {
+		Size = UDim2.new(1, 0, 0, 22),
+		BackgroundColor3 = T.Hdr,
+		BorderSizePixel = 0,
+		Text = "[ KEYBINDS ]",
+		TextColor3 = T.AccR,
+		TextSize = 11,
+		Font = Enum.Font.Code,
+		Parent = self.KLF
+	})
+
+	CI("Frame", {
+		Size = UDim2.new(1, 0, 0, 1),
+		Position = UDim2.new(0, 0, 0, 22),
+		BackgroundColor3 = T.Bdr,
+		BorderSizePixel = 0,
+		Parent = self.KLF
+	})
+
+	self.KLC = CI("Frame", {
+		Size = UDim2.new(1, -8, 1, -30),
+		Position = UDim2.new(0, 4, 0, 26),
+		BackgroundTransparency = 1,
+		Parent = self.KLF
+	})
+
+	CI("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 2),
+		Parent = self.KLC
+	})
+
+	self:MKLD()
+
+	return self.KLF
+end
+
+function Lib:MKLD()
+	if not self.KLF then return end
+	local dg, ds, sp = false, nil, nil
+
+	self.KLF.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
+			dg = true
+			ds = i.Position
+			sp = self.KLF.Position
+		end
+	end)
+
+	self.KLF.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then dg = false end
+	end)
+
+	UIS.InputChanged:Connect(function(i)
+		if dg and i.UserInputType == Enum.UserInputType.MouseMovement then
+			local d = i.Position - ds
+			self.KLF.Position = UDim2.new(sp.X.Scale, sp.X.Offset + d.X, sp.Y.Scale, sp.Y.Offset + d.Y)
+		end
+	end)
+end
+
+function Lib:SKL(v)
+	if self.KLF then self.KLF.Visible = v end
+end
+
+function Lib:UKL()
+	if not self.KLC then return end
+	for _, c in pairs(self.KLC:GetChildren()) do
+		if c:IsA("TextLabel") then c:Destroy() end
+	end
+
+	for n, k in pairs(KBL) do
+		CI("TextLabel", {
+			Size = UDim2.new(1, 0, 0, 16),
+			BackgroundTransparency = 1,
+			Text = "[" .. k .. "] " .. n,
+			TextColor3 = T.TxD,
+			TextSize = 9,
+			Font = Enum.Font.Code,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = self.KLC
+		})
+	end
+end
+
+function Lib:MD()
+	local dg, ds, sp = false, nil, nil
+
+	self.Hdr.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then
+			dg = true
+			ds = i.Position
+			sp = self.MF.Position
+		end
+	end)
+
+	self.Hdr.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 then dg = false end
+	end)
+
+	UIS.InputChanged:Connect(function(i)
+		if dg and i.UserInputType == Enum.UserInputType.MouseMovement then
+			local d = i.Position - ds
+			self.MF.Position = UDim2.new(sp.X.Scale, sp.X.Offset + d.X, sp.Y.Scale, sp.Y.Offset + d.Y)
+		end
+	end)
+end
+
+function Lib:AT(n)
+	local Tb = {}
+	local sr = self
+
+	Tb.Btn = CI("TextButton", {
+		Name = n,
+		Size = UDim2.new(1, 0, 0, 28),
+		BackgroundTransparency = 1,
+		Text = "",
+		BorderSizePixel = 0,
+		Parent = self.TC
+	})
+
+	local Ind = CI("Frame", {
+		Size = UDim2.new(0, 3, 1, -6),
+		Position = UDim2.new(0, 0, 0, 3),
+		BackgroundColor3 = T.AccR,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Parent = Tb.Btn
+	})
+
+	local TbL = CI("TextLabel", {
+		Size = UDim2.new(1, -10, 1, 0),
+		Position = UDim2.new(0, 8, 0, 0),
+		BackgroundTransparency = 1,
+		Text = n:upper(),
+		TextColor3 = T.TxD,
+		TextSize = 12,
+		Font = Enum.Font.Code,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = Tb.Btn
+	})
+
+	Tb.Cnt = CI("Frame", {
+		Name = n .. "C",
+		Size = UDim2.new(1, -8, 1, -8),
+		Position = UDim2.new(0, 4, 0, 4),
+		BackgroundTransparency = 1,
+		Visible = false,
+		Parent = self.CC
+	})
+
+	Tb.LC = CI("ScrollingFrame", {
+		Size = UDim2.new(0.5, -4, 1, 0),
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ScrollBarThickness = 3,
+		ScrollBarImageColor3 = T.Acc,
+		CanvasSize = UDim2.new(0, 0, 0, 0),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		Parent = Tb.Cnt
+	})
+
+	CI("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4), Parent = Tb.LC })
+	CI("UIPadding", { PaddingTop = UDim.new(0, 2), PaddingBottom = UDim.new(0, 2), Parent = Tb.LC })
+
+	Tb.RC = CI("ScrollingFrame", {
+		Size = UDim2.new(0.5, -4, 1, 0),
+		Position = UDim2.new(0.5, 4, 0, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ScrollBarThickness = 3,
+		ScrollBarImageColor3 = T.Acc,
+		CanvasSize = UDim2.new(0, 0, 0, 0),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		Parent = Tb.Cnt
+	})
+
+	CI("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4), Parent = Tb.RC })
+	CI("UIPadding", { PaddingTop = UDim.new(0, 2), PaddingBottom = UDim.new(0, 2), Parent = Tb.RC })
+
+	local function Act()
+		for _, tb in pairs(self.Tbs) do
+			tb.Cnt.Visible = false
+			for _, c in pairs(tb.Btn:GetChildren()) do
+				if c:IsA("TextLabel") then c.TextColor3 = T.TxD end
+				if c:IsA("Frame") then c.BackgroundTransparency = 1 end
+			end
+		end
+		Tb.Cnt.Visible = true
+		TbL.TextColor3 = T.AccR
+		Ind.BackgroundTransparency = 0
+		self.CTb = Tb
+	end
+
+	Tb.Btn.MouseButton1Click:Connect(Act)
+	Tb.Btn.MouseEnter:Connect(function() if self.CTb ~= Tb then TbL.TextColor3 = T.AccR end end)
+	Tb.Btn.MouseLeave:Connect(function() if self.CTb ~= Tb then TbL.TextColor3 = T.TxD end end)
+
+	self.Tbs[n] = Tb
+	if not self.CTb then Act() end
+
+	function Tb:AS(t, c)
+		local pr = c == "right" and self.RC or self.LC
+
+		local SF = CI("Frame", {
+			Size = UDim2.new(1, 0, 0, 0),
+			BackgroundColor3 = T.Sec,
+			BorderSizePixel = 1,
+			BorderColor3 = T.Bdr,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Parent = pr
+		})
+
+		CI("TextLabel", {
+			Size = UDim2.new(1, 0, 0, 22),
+			BackgroundColor3 = T.Hdr,
+			BorderSizePixel = 0,
+			Text = "  " .. t:upper(),
+			TextColor3 = T.AccR,
+			TextSize = 11,
+			Font = Enum.Font.Code,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = SF
+		})
+
+		CI("Frame", {
+			Size = UDim2.new(1, 0, 0, 1),
+			Position = UDim2.new(0, 0, 0, 22),
+			BackgroundColor3 = T.Bdr,
+			BorderSizePixel = 0,
+			Parent = SF
+		})
+
+		local SC = CI("Frame", {
+			Size = UDim2.new(1, -6, 0, 0),
+			Position = UDim2.new(0, 3, 0, 25),
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Parent = SF
+		})
+
+		CI("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2), Parent = SC })
+		CI("UIPadding", { PaddingBottom = UDim.new(0, 4), Parent = SC })
+
+		local Sec = {}
+
+		function Sec:ATg(n, d, cb)
+			local en = d or false
+
+			local TF = CI("Frame", {
+				Size = UDim2.new(1, 0, 0, 22),
+				BackgroundTransparency = 1,
+				Parent = SC
+			})
+
+			CI("TextLabel", {
+				Size = UDim2.new(1, -30, 1, 0),
+				Position = UDim2.new(0, 4, 0, 0),
+				BackgroundTransparency = 1,
+				Text = n,
+				TextColor3 = T.AccR,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = TF
+			})
+
+			local TB = CI("Frame", {
+				Size = UDim2.new(0, 14, 0, 14),
+				Position = UDim2.new(1, -18, 0.5, -7),
+				BackgroundColor3 = en and T.TgE or T.TgD,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Parent = TF
+			})
+
+			local TBtn = CI("TextButton", {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1,
+				Text = "",
+				Parent = TF
+			})
+
+			local function Upd()
+				en = not en
+				TB.BackgroundColor3 = en and T.TgE or T.TgD
+				if cb then cb(en) end
+			end
+
+			TBtn.MouseButton1Click:Connect(Upd)
+
+			return { Set = function(v) if en ~= v then Upd() end end, Get = function() return en end }
+		end
+
+		function Sec:ASl(n, mn, mx, d, cb)
+			local v = d or mn
+
+			local SlF = CI("Frame", {
+				Size = UDim2.new(1, 0, 0, 36),
+				BackgroundTransparency = 1,
+				Parent = SC
+			})
+
+			CI("TextLabel", {
+				Size = UDim2.new(0.65, 0, 0, 14),
+				Position = UDim2.new(0, 4, 0, 0),
+				BackgroundTransparency = 1,
+				Text = n,
+				TextColor3 = T.AccR,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = SlF
+			})
+
+			local VL = CI("TextLabel", {
+				Size = UDim2.new(0.35, -4, 0, 14),
+				Position = UDim2.new(0.65, 0, 0, 0),
+				BackgroundTransparency = 1,
+				Text = tostring(v),
+				TextColor3 = T.AccG,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				Parent = SlF
+			})
+
+			local SB = CI("Frame", {
+				Size = UDim2.new(1, -8, 0, 12),
+				Position = UDim2.new(0, 4, 0, 18),
+				BackgroundColor3 = T.Sld,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Parent = SlF
+			})
+
+			local SFl = CI("Frame", {
+				Size = UDim2.new((v - mn) / (mx - mn), 0, 1, 0),
+				BackgroundColor3 = T.SlF,
+				BorderSizePixel = 0,
+				Parent = SB
+			})
+
+			local SBtn = CI("TextButton", {
+				Size = UDim2.new(1, 0, 1, 10),
+				Position = UDim2.new(0, 0, 0, -5),
+				BackgroundTransparency = 1,
+				Text = "",
+				Parent = SB
+			})
+
+			local dg = false
+
+			local function US(i)
+				local p = math.clamp((i.Position.X - SB.AbsolutePosition.X) / SB.AbsoluteSize.X, 0, 1)
+				v = math.floor(mn + (mx - mn) * p)
+				VL.Text = tostring(v)
+				SFl.Size = UDim2.new(p, 0, 1, 0)
+				if cb then cb(v) end
+			end
+
+			SBtn.MouseButton1Down:Connect(function() dg = true end)
+			UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dg = false end end)
+			UIS.InputChanged:Connect(function(i) if dg and i.UserInputType == Enum.UserInputType.MouseMovement then US(i) end end)
+			SBtn.MouseButton1Click:Connect(function() US({Position = Vector3.new(Plr:GetMouse().X, 0, 0)}) end)
+
+			return { Set = function(nv) v = math.clamp(nv, mn, mx) VL.Text = tostring(v) SFl.Size = UDim2.new((v - mn) / (mx - mn), 0, 1, 0) end, Get = function() return v end }
+		end
+
+		function Sec:ABt(n, cb)
+			local BF = CI("TextButton", {
+				Size = UDim2.new(1, 0, 0, 22),
+				BackgroundColor3 = T.Btn,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Text = n,
+				TextColor3 = T.AccR,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				Parent = SC
+			})
+
+			BF.MouseButton1Click:Connect(function()
+				BF.BackgroundColor3 = T.BtA
+				wait(0.1)
+				BF.BackgroundColor3 = T.Btn
+				if cb then cb() end
+			end)
+
+			BF.MouseEnter:Connect(function() BF.BackgroundColor3 = T.BtH end)
+			BF.MouseLeave:Connect(function() BF.BackgroundColor3 = T.Btn end)
+
+			return BF
+		end
+
+		function Sec:ALb(txt)
+			local L = CI("TextLabel", {
+				Size = UDim2.new(1, 0, 0, 16),
+				BackgroundTransparency = 1,
+				Text = txt,
+				TextColor3 = T.TxD,
+				TextSize = 9,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = SC
+			})
+			return { Set = function(t) L.Text = t end }
+		end
+
+		function Sec:ADD(n, o, d, cb)
+			local sel = d or o[1]
+			local opn = false
+
+			local DF = CI("Frame", {
+				Size = UDim2.new(1, 0, 0, 20),
+				BackgroundTransparency = 1,
+				Parent = SC
+			})
+
+			CI("TextLabel", {
+				Size = UDim2.new(0.4, 0, 1, 0),
+				Position = UDim2.new(0, 4, 0, 0),
+				BackgroundTransparency = 1,
+				Text = n,
+				TextColor3 = T.AccR,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = DF
+			})
+
+			local SB = CI("TextButton", {
+				Size = UDim2.new(0.6, -8, 0, 16),
+				Position = UDim2.new(0.4, 0, 0.5, -8),
+				BackgroundColor3 = T.BgA,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Text = sel .. " v",
+				TextColor3 = T.AccR,
+				TextSize = 9,
+				Font = Enum.Font.Code,
+				Parent = DF
+			})
+
+			local DP = CI("Frame", {
+				Size = UDim2.new(0, 150, 0, #o * 18 + 4),
+				BackgroundColor3 = T.Bg,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Visible = false,
+				ZIndex = 9999,
+				Parent = sr.SG
+			})
+
+			CI("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 1), Parent = DP })
+			CI("UIPadding", { PaddingTop = UDim.new(0, 2), PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2), Parent = DP })
+
+			for _, op in ipairs(o) do
+				local OB = CI("TextButton", {
+					Size = UDim2.new(1, 0, 0, 16),
+					BackgroundColor3 = op == sel and T.BtA or T.Btn,
+					BorderSizePixel = 0,
+					Text = op,
+					TextColor3 = op == sel and T.AccR or T.TxD,
+					TextSize = 9,
+					Font = Enum.Font.Code,
+					ZIndex = 10000,
+					Parent = DP
+				})
+
+				OB.MouseButton1Click:Connect(function()
+					sel = op
+					SB.Text = sel .. " v"
+					for _, b in pairs(DP:GetChildren()) do
+						if b:IsA("TextButton") then
+							b.BackgroundColor3 = b.Text == sel and T.BtA or T.Btn
+							b.TextColor3 = b.Text == sel and T.AccR or T.TxD
+						end
+					end
+					opn = false
+					DP.Visible = false
+					if cb then cb(sel) end
+				end)
+
+				OB.MouseEnter:Connect(function() if op ~= sel then OB.BackgroundColor3 = T.BtH OB.TextColor3 = T.Txt end end)
+				OB.MouseLeave:Connect(function() if op ~= sel then OB.BackgroundColor3 = T.Btn OB.TextColor3 = T.TxD end end)
+			end
+
+			SB.MouseButton1Click:Connect(function()
+				opn = not opn
+				if opn then
+					local ps = SB.AbsolutePosition
+					local sz = SB.AbsoluteSize
+					DP.Position = UDim2.new(0, ps.X, 0, ps.Y + sz.Y + 2)
+					DP.Size = UDim2.new(0, sz.X, 0, #o * 18 + 4)
+				end
+				DP.Visible = opn
+				SB.Text = sel .. (opn and " ^" or " v")
+			end)
+
+			UIS.InputBegan:Connect(function(i)
+				if i.UserInputType == Enum.UserInputType.MouseButton1 and opn then
+					local m = UIS:GetMouseLocation()
+					local pP, pS = DP.AbsolutePosition, DP.AbsoluteSize
+					local bP, bS = SB.AbsolutePosition, SB.AbsoluteSize
+					if not (m.X >= pP.X and m.X <= pP.X + pS.X and m.Y >= pP.Y and m.Y <= pP.Y + pS.Y) and
+						not (m.X >= bP.X and m.X <= bP.X + bS.X and m.Y >= bP.Y and m.Y <= bP.Y + bS.Y) then
+						task.defer(function() opn = false DP.Visible = false SB.Text = sel .. " v" end)
+					end
+				end
+			end)
+
+			return { Set = function(v) if table.find(o, v) then sel = v SB.Text = sel .. " v" end end, Get = function() return sel end }
+		end
+
+		function Sec:ACP(n, d, cb)
+			local cc = d or Color3.fromRGB(255, 0, 0)
+			local opn = false
+			local h, st, vl = Color3.toHSV(cc)
+
+			local CF = CI("Frame", {
+				Size = UDim2.new(1, 0, 0, 22),
+				BackgroundTransparency = 1,
+				Parent = SC
+			})
+
+			CI("TextLabel", {
+				Size = UDim2.new(1, -35, 1, 0),
+				Position = UDim2.new(0, 4, 0, 0),
+				BackgroundTransparency = 1,
+				Text = n,
+				TextColor3 = T.AccR,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = CF
+			})
+
+			local CP = CI("TextButton", {
+				Size = UDim2.new(0, 18, 0, 12),
+				Position = UDim2.new(1, -22, 0.5, -6),
+				BackgroundColor3 = cc,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Text = "",
+				Parent = CF
+			})
+
+			local CPC = CI("UICorner", {
+				CornerRadius = UDim.new(0, 4),
+				Parent = CP
+			})
+
+			local CPP = CI("Frame", {
+				Size = UDim2.new(0, 180, 0, 150),
+				BackgroundColor3 = T.Bg,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Visible = false,
+				ZIndex = 9999,
+				Parent = sr.SG
+			})
+
+			local SVP = CI("Frame", {
+				Size = UDim2.new(0, 130, 0, 100),
+				Position = UDim2.new(0, 5, 0, 5),
+				BackgroundColor3 = Color3.fromHSV(h, 1, 1),
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				ZIndex = 10000,
+				Parent = CPP
+			})
+
+			CI("UIGradient", {
+				Color = ColorSequence.new(Color3.new(1, 1, 1)),
+				Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)}),
+				Parent = SVP
+			})
+
+			local BO = CI("Frame", {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundColor3 = Color3.new(0, 0, 0),
+				BorderSizePixel = 0,
+				ZIndex = 10001,
+				Parent = SVP
+			})
+
+			CI("UIGradient", {
+				Color = ColorSequence.new(Color3.new(0, 0, 0)),
+				Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0)}),
+				Rotation = 90,
+				Parent = BO
+			})
+
+			local SVC = CI("Frame", {
+				Size = UDim2.new(0, 6, 0, 6),
+				Position = UDim2.new(st, -3, 1 - vl, -3),
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BorderSizePixel = 1,
+				BorderColor3 = Color3.new(0, 0, 0),
+				ZIndex = 10003,
+				Parent = SVP
+			})
+
+			local HS = CI("Frame", {
+				Size = UDim2.new(0, 18, 0, 100),
+				Position = UDim2.new(0, 145, 0, 5),
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				ZIndex = 10000,
+				Parent = CPP
+			})
+
+			CI("UIGradient", {
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+					ColorSequenceKeypoint.new(0.167, Color3.fromRGB(255, 255, 0)),
+					ColorSequenceKeypoint.new(0.333, Color3.fromRGB(0, 255, 0)),
+					ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+					ColorSequenceKeypoint.new(0.667, Color3.fromRGB(0, 0, 255)),
+					ColorSequenceKeypoint.new(0.833, Color3.fromRGB(255, 0, 255)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+				}),
+				Rotation = 90,
+				Parent = HS
+			})
+
+			local HC = CI("Frame", {
+				Size = UDim2.new(1, 4, 0, 4),
+				Position = UDim2.new(0, -2, h, -2),
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BorderSizePixel = 1,
+				BorderColor3 = Color3.new(0, 0, 0),
+				ZIndex = 10001,
+				Parent = HS
+			})
+
+			local RD = CI("TextLabel", {
+				Size = UDim2.new(0, 100, 0, 18),
+				Position = UDim2.new(0, 5, 1, -23),
+				BackgroundColor3 = T.BgA,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Text = string.format("R:%d G:%d B:%d", math.floor(cc.R * 255), math.floor(cc.G * 255), math.floor(cc.B * 255)),
+				TextColor3 = T.Txt,
+				TextSize = 9,
+				Font = Enum.Font.Code,
+				ZIndex = 10000,
+				Parent = CPP
+			})
+
+			local PP = CI("Frame", {
+				Size = UDim2.new(0, 50, 0, 18),
+				Position = UDim2.new(0, 115, 1, -23),
+				BackgroundColor3 = cc,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				ZIndex = 10000,
+				Parent = CPP
+			})
+
+			local function UC()
+				cc = Color3.fromHSV(h, st, vl)
+				CP.BackgroundColor3 = cc
+				PP.BackgroundColor3 = cc
+				SVP.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+				SVC.Position = UDim2.new(st, -3, 1 - vl, -3)
+				HC.Position = UDim2.new(0, -2, h, -2)
+				RD.Text = string.format("R:%d G:%d B:%d", math.floor(cc.R * 255), math.floor(cc.G * 255), math.floor(cc.B * 255))
+				if cb then cb(cc) end
+			end
+
+			local dSV, dH = false, false
+
+			local SVB = CI("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Text = "", ZIndex = 10002, Parent = SVP })
+			local HB = CI("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Text = "", ZIndex = 10002, Parent = HS })
+
+			SVB.MouseButton1Down:Connect(function() dSV = true end)
+			HB.MouseButton1Down:Connect(function() dH = true end)
+
+			UIS.InputChanged:Connect(function(i)
+				if i.UserInputType == Enum.UserInputType.MouseMovement then
+					if dSV then
+						st = math.clamp((i.Position.X - SVP.AbsolutePosition.X) / SVP.AbsoluteSize.X, 0, 1)
+						vl = 1 - math.clamp((i.Position.Y - SVP.AbsolutePosition.Y) / SVP.AbsoluteSize.Y, 0, 1)
+						UC()
+					elseif dH then
+						h = math.clamp((i.Position.Y - HS.AbsolutePosition.Y) / HS.AbsoluteSize.Y, 0, 1)
+						UC()
+					end
+				end
+			end)
+
+			UIS.InputEnded:Connect(function(i)
+				if i.UserInputType == Enum.UserInputType.MouseButton1 then dSV = false dH = false end
+			end)
+
+			SVB.MouseButton1Click:Connect(function()
+				local m = Plr:GetMouse()
+				st = math.clamp((m.X - SVP.AbsolutePosition.X) / SVP.AbsoluteSize.X, 0, 1)
+				vl = 1 - math.clamp((m.Y - SVP.AbsolutePosition.Y) / SVP.AbsoluteSize.Y, 0, 1)
+				UC()
+			end)
+
+			HB.MouseButton1Click:Connect(function()
+				local m = Plr:GetMouse()
+				h = math.clamp((m.Y - HS.AbsolutePosition.Y) / HS.AbsoluteSize.Y, 0, 1)
+				UC()
+			end)
+
+			CP.MouseButton1Click:Connect(function()
+				opn = not opn
+				if opn then
+					local ps = CP.AbsolutePosition
+					CPP.Position = UDim2.new(0, ps.X - 155, 0, ps.Y + 20)
+				end
+				CPP.Visible = opn
+			end)
+
+			UIS.InputBegan:Connect(function(i)
+				if i.UserInputType == Enum.UserInputType.MouseButton1 and opn and not dSV and not dH then
+					local m = UIS:GetMouseLocation()
+					local pP, pS = CPP.AbsolutePosition, CPP.AbsoluteSize
+					local bP, bS = CP.AbsolutePosition, CP.AbsoluteSize
+					if not (m.X >= pP.X and m.X <= pP.X + pS.X and m.Y >= pP.Y and m.Y <= pP.Y + pS.Y) and
+						not (m.X >= bP.X and m.X <= bP.X + bS.X and m.Y >= bP.Y and m.Y <= bP.Y + bS.Y) then
+						task.defer(function() opn = false CPP.Visible = false end)
+					end
+				end
+			end)
+
+			return { Set = function(c) cc = c h, st, vl = Color3.toHSV(c) UC() end, Get = function() return cc end }
+		end
+
+		function Sec:AKB(n, d, cb)
+			local k = d or Enum.KeyCode.Unknown
+			local ls = false
+
+			local KF = CI("Frame", {
+				Size = UDim2.new(1, 0, 0, 22),
+				BackgroundTransparency = 1,
+				Parent = SC
+			})
+
+			CI("TextLabel", {
+				Size = UDim2.new(1, -55, 1, 0),
+				Position = UDim2.new(0, 4, 0, 0),
+				BackgroundTransparency = 1,
+				Text = n,
+				TextColor3 = T.AccR,
+				TextSize = 10,
+				Font = Enum.Font.Code,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = KF
+			})
+
+			local KB = CI("TextButton", {
+				Size = UDim2.new(0, 45, 0, 16),
+				Position = UDim2.new(1, -49, 0.5, -8),
+				BackgroundColor3 = T.BgA,
+				BorderSizePixel = 1,
+				BorderColor3 = T.Bdr,
+				Text = k ~= Enum.KeyCode.Unknown and k.Name or "NONE",
+				TextColor3 = T.AccR,
+				TextSize = 8,
+				Font = Enum.Font.Code,
+				Parent = KF
+			})
+
+			if k ~= Enum.KeyCode.Unknown then
+				KBL[n] = k.Name
+				sr:UKL()
+			end
+
+			KB.MouseButton1Click:Connect(function()
+				ls = true
+				KB.Text = "..."
+				KB.TextColor3 = T.Txt
+			end)
+
+			UIS.InputBegan:Connect(function(i, p)
+				if ls and i.UserInputType == Enum.UserInputType.Keyboard then
+					if i.KeyCode == Enum.KeyCode.Escape then
+						k = Enum.KeyCode.Unknown
+						KB.Text = "NONE"
+						KBL[n] = nil
+					else
+						k = i.KeyCode
+						KB.Text = k.Name
+						KBL[n] = k.Name
+					end
+					KB.TextColor3 = T.AccR
+					ls = false
+					sr:UKL()
+				elseif not ls and not p and i.KeyCode == k and k ~= Enum.KeyCode.Unknown then
+					if cb then cb() end
+				end
+			end)
+
+			return { Set = function(nk) k = nk KB.Text = k ~= Enum.KeyCode.Unknown and k.Name or "NONE" if k ~= Enum.KeyCode.Unknown then KBL[n] = k.Name else KBL[n] = nil end sr:UKL() end, Get = function() return k end }
+		end
+
+		return Sec
+	end
+
+	return Tb
+end
+
+return Lib
