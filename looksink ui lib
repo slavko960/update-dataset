@@ -719,6 +719,12 @@ function Lib:AT(n)
 					local sz = SB.AbsoluteSize
 					DP.Position = UDim2.new(0, ps.X, 0, ps.Y + sz.Y + 2)
 					DP.Size = UDim2.new(0, sz.X, 0, #o * 18 + 4)
+					DP.ZIndex = 9999
+					for _, ob in pairs(DP:GetChildren()) do
+						if ob:IsA("TextButton") then
+							ob.ZIndex = 10000
+						end
+					end
 				end
 				DP.Visible = opn
 				SB.Text = sel .. (opn and " ^" or " v")
@@ -960,7 +966,7 @@ function Lib:AT(n)
 		end
 
 		function Sec:AKB(n, d, cb)
-			local k = d or Enum.KeyCode.Unknown
+			local k = d or (Enum.KeyCode.Unknown)
 			local ls = false
 
 			local KF = CI("Frame", {
@@ -981,13 +987,24 @@ function Lib:AT(n)
 				Parent = KF
 			})
 
+			local function keyName(v)
+				if typeof(v) == "EnumItem" then
+					if v.EnumType == Enum.KeyCode then
+						return v.Name
+					elseif v.EnumType == Enum.UserInputType then
+						return v.Name
+					end
+				end
+				return tostring(v)
+			end
+
 			local KB = CI("TextButton", {
 				Size = UDim2.new(0, 45, 0, 16),
 				Position = UDim2.new(1, -49, 0.5, -8),
 				BackgroundColor3 = T.BgA,
 				BorderSizePixel = 1,
 				BorderColor3 = T.Bdr,
-				Text = k ~= Enum.KeyCode.Unknown and k.Name or "NONE",
+				Text = k ~= Enum.KeyCode.Unknown and keyName(k) or "NONE",
 				TextColor3 = T.AccR,
 				TextSize = 8,
 				Font = Enum.Font.Code,
@@ -995,7 +1012,7 @@ function Lib:AT(n)
 			})
 
 			if k ~= Enum.KeyCode.Unknown then
-				KBL[n] = k.Name
+				KBL[n] = keyName(k)
 				sr:UKL()
 			end
 
@@ -1006,25 +1023,39 @@ function Lib:AT(n)
 			end)
 
 			UIS.InputBegan:Connect(function(i, p)
-				if ls and i.UserInputType == Enum.UserInputType.Keyboard then
+				if ls then
 					if i.KeyCode == Enum.KeyCode.Escape then
 						k = Enum.KeyCode.Unknown
 						KB.Text = "NONE"
 						KBL[n] = nil
-					else
+					elseif i.UserInputType == Enum.UserInputType.Keyboard then
 						k = i.KeyCode
-						KB.Text = k.Name
-						KBL[n] = k.Name
+						KB.Text = keyName(k)
+						KBL[n] = keyName(k)
+					elseif i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.MouseButton2 or i.UserInputType == Enum.UserInputType.MouseButton3 then
+						k = i.UserInputType
+						KB.Text = keyName(k)
+						KBL[n] = keyName(k)
 					end
 					KB.TextColor3 = T.AccR
 					ls = false
 					sr:UKL()
-				elseif not ls and not p and i.KeyCode == k and k ~= Enum.KeyCode.Unknown then
-					if cb then cb() end
+				elseif not ls and not p then
+					local match = false
+					if typeof(k) == "EnumItem" then
+						if k.EnumType == Enum.KeyCode and i.KeyCode == k then
+							match = true
+						elseif k.EnumType == Enum.UserInputType and i.UserInputType == k then
+							match = true
+						end
+					end
+					if match and k ~= Enum.KeyCode.Unknown then
+						if cb then cb() end
+					end
 				end
 			end)
 
-			return { Set = function(nk) k = nk KB.Text = k ~= Enum.KeyCode.Unknown and k.Name or "NONE" if k ~= Enum.KeyCode.Unknown then KBL[n] = k.Name else KBL[n] = nil end sr:UKL() end, Get = function() return k end }
+			return { Set = function(nk) k = nk KB.Text = k ~= Enum.KeyCode.Unknown and keyName(k) or "NONE" if k ~= Enum.KeyCode.Unknown then KBL[n] = keyName(k) else KBL[n] = nil end sr:UKL() end, Get = function() return k end }
 		end
 
 		return Sec
