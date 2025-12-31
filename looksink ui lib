@@ -3,7 +3,7 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local Plr = Pls.LocalPlayer
 local UIsafe = gethui() or game:GetService("CoreGui") --or Plr:WaitForChild("PlayerGui") -- only for tests in roblox studio
-local PG = 
+local PG = UIsafe
 
 local T = {
 	Bg = Color3.fromRGB(15, 15, 15),
