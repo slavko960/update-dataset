@@ -1,4 +1,4 @@
-сделай готовый exemple
+-- create your exemple. chat gpt user..
 local ImGui = loadstring(game:HttpGet("https://pastebin.com/raw/JC8TKPzW"))()
 
 _G.LooksinkTheme:LoadStartup()
@@ -178,4 +178,5 @@ end)
 
 themeSec:AddButton("Reset Theme", function()
 	_G.LooksinkTheme:Reset()
+
 end)
