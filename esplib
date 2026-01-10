@@ -374,8 +374,8 @@ do
       function playerESP:loop(settings, distance)
           local current = self.current;
       
-          local _, size     = getBoundingBox(current.character, true);  -- изменено с current.humanoid на current.character
-          local goal        = current.rebuiltPos or current.rootPart.Position;
+          local cf, size = getBoundingBox(current.character, true);
+          local goal = cf.Position;
       
           local vector2, onscreen = worldToViewPoint(goal);
           if (not onscreen) then
@@ -383,10 +383,10 @@ do
           end;
           self.hidden = false;
       
-          local cframe      = CFrame.new(goal, currentCamera.CFrame.Position);
+          local cframe = CFrame.new(goal, currentCamera.CFrame.Position);
       
           local x, y = -size.X / 2, size.Y / 2;
-          local topright    = worldToViewPoint((cframe * CFrame.new(x, y, 0)).Position)
+          local topright = worldToViewPoint((cframe * CFrame.new(x, y, 0)).Position)
           local bottomright = worldToViewPoint((cframe * CFrame.new(x, -y, 0)).Position)
       
           local offset = Vector2.new(
