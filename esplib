@@ -370,36 +370,35 @@ do
             end;
       end;
       function playerESP:loop(settings, distance)
-            local current = self.current;
-
-            local _, size     = getBoundingBox(current.humanoid, true);
-            local goal        = current.rebuiltPos or current.rootPart.Position;
-
-            local vector2, onscreen = worldToViewPoint(goal);
-            if (not onscreen) then
-                  return self:hideDrawings();
-            end;
-            self.hidden = false;
-
-            local cframe      = CFrame.new(goal, currentCamera.CFrame.Position);
-
-            local x, y = -size.X / 2, size.Y / 2;
-            local topright    = worldToViewPoint((cframe * CFrame.new(x, y, 0)).Position)
-            local bottomright = worldToViewPoint((cframe * CFrame.new(x, -y, 0)).Position)
-
-            local offset = Vector2.new(
-                  math.max(topright.X - vector2.X, bottomright.X - vector2.X),
-                  math.max((vector2.Y - topright.Y), (bottomright.Y - vector2.Y))
-            );
-
-            -- Update RGB colors if enabled
-            self:updateColors();
-
-            self:renderBox(vector2, offset, settings.box);
-            self:renderName(vector2, offset, settings.name);
-            self:renderDistance(vector2, offset, settings.distance, distance);
-            self:renderHealthbar(vector2, offset, settings.healthbar);
-            self:renderWeapon(vector2, offset, settings.weapon);
+          local current = self.current;
+      
+          local _, size     = getBoundingBox(current.character, true);  -- изменено с current.humanoid на current.character
+          local goal        = current.rebuiltPos or current.rootPart.Position;
+      
+          local vector2, onscreen = worldToViewPoint(goal);
+          if (not onscreen) then
+              return self:hideDrawings();
+          end;
+          self.hidden = false;
+      
+          local cframe      = CFrame.new(goal, currentCamera.CFrame.Position);
+      
+          local x, y = -size.X / 2, size.Y / 2;
+          local topright    = worldToViewPoint((cframe * CFrame.new(x, y, 0)).Position)
+          local bottomright = worldToViewPoint((cframe * CFrame.new(x, -y, 0)).Position)
+      
+          local offset = Vector2.new(
+              math.max(topright.X - vector2.X, bottomright.X - vector2.X),
+              math.max((vector2.Y - topright.Y), (bottomright.Y - vector2.Y))
+          );
+      
+          self:updateColors();
+      
+          self:renderBox(vector2, offset, settings.box);
+          self:renderName(vector2, offset, settings.name);
+          self:renderDistance(vector2, offset, settings.distance, distance);
+          self:renderHealthbar(vector2, offset, settings.healthbar);
+          self:renderWeapon(vector2, offset, settings.weapon);
       end;
       
       function playerESP:updateColors()
