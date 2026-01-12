@@ -342,7 +342,8 @@ function Lib.new(o)
 		Parent = PG
 	})
 
-	s.MF = CI("Frame", {
+	-- Основной фрейм
+	s.MF = CI("Frame", { 
 		Name = "MF",
 		Size = s.Sz,
 		Position = UDim2.new(0.5, -s.Sz.X.Offset/2, 0.5, -s.Sz.Y.Offset/2),
@@ -351,6 +352,23 @@ function Lib.new(o)
 		BorderColor3 = T.Bdr,
 		Parent = s.SG
 	})
+
+	-- === ДОБАВЛЕНА ТЕНЬ (SHADOW) ===
+	CI("ImageLabel", {
+		Name = "Shadow",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1, 60, 1, 60), -- Тень на 60px больше фрейма (торчит по 30px с краев)
+		BackgroundTransparency = 1,
+		Image = "rbxassetid://6015897843", -- Тот самый ID тени
+		ImageColor3 = Color3.new(0, 0, 0),
+		ImageTransparency = 0.3, -- Насколько тень темная
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(49, 49, 450, 450),
+		ZIndex = 0, -- Чтобы была под контентом
+		Parent = s.MF
+	})
+	-- ==============================
 
 	s.Hdr = CI("Frame", {
 		Name = "Hdr",
@@ -2340,5 +2358,6 @@ function Lib:AddTab(n)
 
 	return Tb
 end
+
 
 return Lib
