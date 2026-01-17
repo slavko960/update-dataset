@@ -1,5 +1,5 @@
 -- create your exemple. chat gpt user..
-local ImGui = loadstring(game:HttpGet("https://pastebin.com/raw/JC8TKPzW"))()
+local ImGui = loadstring(game:HttpGet("https://raw.githubusercontent.com/slavko960/update-dataset/refs/heads/main/looksink/looksink%20lib.lua"))()
 
 _G.LooksinkTheme:LoadStartup()
 
@@ -180,3 +180,4 @@ themeSec:AddButton("Reset Theme", function()
 	_G.LooksinkTheme:Reset()
 
 end)
+
