@@ -342,7 +342,6 @@ function Lib.new(o)
 		Parent = PG
 	})
 
-	-- Основной фрейм
 	s.MF = CI("Frame", { 
 		Name = "MF",
 		Size = s.Sz,
@@ -353,22 +352,20 @@ function Lib.new(o)
 		Parent = s.SG
 	})
 
-	-- === ДОБАВЛЕНА ТЕНЬ (SHADOW) ===
 	CI("ImageLabel", {
 		Name = "Shadow",
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(1, 60, 1, 60), -- Тень на 60px больше фрейма (торчит по 30px с краев)
+		Size = UDim2.new(1, 60, 1, 60),
 		BackgroundTransparency = 1,
-		Image = "rbxassetid://6015897843", -- Тот самый ID тени
+		Image = "rbxassetid://6015897843",
 		ImageColor3 = Color3.new(0, 0, 0),
-		ImageTransparency = 0.3, -- Насколько тень темная
+		ImageTransparency = 0.3,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(49, 49, 450, 450),
-		ZIndex = 0, -- Чтобы была под контентом
+		ZIndex = 0, 
 		Parent = s.MF
 	})
-	-- ==============================
 
 	s.Hdr = CI("Frame", {
 		Name = "Hdr",
@@ -1356,8 +1353,8 @@ function Lib:AddTab(n)
                             Name = "SelectedIcon",
                             Size = UDim2.new(0, 14, 0, 14),
                             Position = UDim2.new(1, -165, 0.5, -7),
-                            Image = "rbxassetid://10709797382",
-                            BackgroundTransparency = 1,
+                            Image = "" --"rbxassetid://10709797382",
+                            --BackgroundTransparency = 0,
                             ZIndex = 10001,
                             Parent = btn
                         })
@@ -2361,3 +2358,4 @@ end
 
 
 return Lib
+
