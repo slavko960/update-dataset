@@ -1353,7 +1353,7 @@ function Lib:AddTab(n)
                             Name = "SelectedIcon",
                             Size = UDim2.new(0, 14, 0, 14),
                             Position = UDim2.new(1, -165, 0.5, -7),
-                            Image = "" --"rbxassetid://10709797382",
+                            Image = "", --"rbxassetid://10709797382",
                             --BackgroundTransparency = 0,
                             ZIndex = 10001,
                             Parent = btn
@@ -2358,4 +2358,5 @@ end
 
 
 return Lib
+
 
