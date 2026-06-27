@@ -1322,7 +1322,7 @@ do
 		if (not a.window.elements.tab_holder:FindFirstChild("UIListLayout")) then
 			Instance_manager.new("UIListLayout", {
 				Name = "UIListLayout";
-				Padding = d(0, 4);
+				Padding = d(0, 2);
 				SortOrder = Enum.SortOrder.LayoutOrder;
 				FillDirection = Enum.FillDirection.Horizontal;
 				VerticalAlignment = Enum.VerticalAlignment.Center;
@@ -1336,7 +1336,8 @@ do
 			BackgroundTransparency = 0;
 			BorderSizePixel = 0;
 			Position = b(0, 0, 0, 0);
-			Size = b(0, 100, 1, -10);
+			Size = b(0, 0, 1, -10),  -- ширина по содержимому
+			AutomaticSize = Enum.AutomaticSize.X,
 			Text = "";
 			Parent = a.window.elements.tab_holder
 		})
@@ -1499,7 +1500,7 @@ do
 					if holderW == 0 then return end
 
 					-- gap между табами = 4, нет внешних паддингов
-					local gap   = 4
+					local gap   = 2
 					local total = holderW - gap * (count - 1)
 					local base  = math.floor(total / count)
 					-- остаток пикселей раздаём первым табам (по 1px)
@@ -1507,7 +1508,7 @@ do
 
 					for i, tab in ipairs(tabs) do
 						local w = base + (i <= extra and 1 or 0)
-						tab.Size = UDim2.new(0, w, 1, -10)
+						tab.Size = UDim2.new(0, w, 1, 0)
 					end
 				end
 
