@@ -2697,6 +2697,7 @@ do
 		}
 		local d, g = false;
 		local i;
+		local _keybind_initialized = false;
 		if not a.Ignore then
 			local b = (a.State == nil) and "None" or a.state;
 			local a = (a.Name == nil) and "None" or a.Name;
@@ -2937,16 +2938,19 @@ do
 						if i then i:SetActive(true) end
 					end
 				end
-			else
+		else
 				d = b;
 				if a.Flag then
 					n.flags[a.Flag] = b
 				end;
-				a.Callback(b)
+				if _keybind_initialized then
+					a.Callback(b)
+				end
 			end
 		end;
 		s(a.State)
 		s(a.Mode)
+		_keybind_initialized = true;
 		q.MouseButton1Click:Connect(function()
 			if a.Binding then return end
 			r.Text = "..."
