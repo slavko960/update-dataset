@@ -1326,7 +1326,7 @@ do
 				SortOrder = Enum.SortOrder.LayoutOrder;
 				FillDirection = Enum.FillDirection.Horizontal;
 				VerticalAlignment = Enum.VerticalAlignment.Center;
-				HorizontalAlignment = Enum.HorizontalAlignment.Left; -- <--- БЫЛО Center, СТАЛО Left
+				HorizontalAlignment = Enum.HorizontalAlignment.Center;
 				Parent = a.window.elements.tab_holder
 			})
 		end;
