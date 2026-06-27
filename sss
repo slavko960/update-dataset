@@ -1,0 +1,3319 @@
+local a = loadstring(game:HttpGet("https://raw.githubusercontent.com/mainstreamed/clones/refs/heads/main/synapse/framework.lua", true))()
+local b = UDim2.new;
+local d = UDim.new;
+local e = Vector2.new;
+local f = Color3.fromRGB;
+local g = a["services"]
+local h = cloneref(g["RunService"])
+local i = cloneref(g["players"])
+local j = cloneref(g["userInputService"])
+local k = cloneref(g["tweenService"])
+local l = cloneref(g.Workspace["CurrentCamera"])
+local g = cloneref(g["lighting"])
+local m = game.GetService(game, "Stats")
+local n = m.Workspace["Heartbeat"]
+local m = m.Network.ServerStatsItem["Data Ping"]
+local l = l["ViewportSize"]
+local m = i["LocalPlayer"]
+local n = m["Name"]
+local m = m:GetMouse()
+local Instance_manager = a.modules.instance_manager
+local signals = a.modules.signals
+local o = loadstring(game:HttpGet("https://raw.githubusercontent.com/mainstreamed/clones/refs/heads/main/synapse/fontCreator.lua"))()
+local o = {
+	smallest_pixel = o:register("ENHANCEMENTS/MENU/FONTS", {
+		name = "smallest pixel",
+		weight = "regular",
+		style = "normal",
+		link = "https://github.com/mainstreamed/clones/raw/refs/heads/main/synapse/smallest_pixel-7.ttf"
+	}),
+	templeos = o:register("ENHANCEMENTS/MENU/FONTS", {
+		name = "templeos",
+		weight = "regular",
+		style = "normal",
+		link = "https://github.com/mainstreamed/clones/raw/refs/heads/main/synapse/Templeos.ttf"
+	}),
+	proggytiny = o:register("ENHANCEMENTS/MENU/FONTS", {
+		name = "proggytiny",
+		weight = "regular",
+		style = "normal",
+		link = "https://github.com/mainstreamed/clones/raw/refs/heads/main/synapse/ProggyTiny.ttf"
+	}),
+	medodica = o:register("ENHANCEMENTS/MENU/FONTS", {
+		name = "medodica",
+		weight = "regular",
+		style = "normal",
+		link = "https://github.com/mainstreamed/clones/raw/refs/heads/main/synapse/MedodicaRegular.ttf"
+	})
+}
+local gethui = gethui or function() return CoreGui end
+local n = ({
+	autoload = true,
+	font = Font.new([[rbxassetid://12187365977]], Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+	font_size = 12,
+	ui_key = Enum.KeyCode.Delete,
+	menu_gui = nil,
+	watermark_gui = nil,
+	noti_screen_gui = nil,
+	keybind_screen_gui = nil,
+	keybind_list = nil,
+	themes = {
+		Blue = {
+			accent     = f(0, 190, 255),
+			risky      = f(200, 0, 0),
+			background = f(36, 36, 36),
+			outline    = f(48, 48, 48),
+			active     = f(255, 255, 255),
+			inactive   = f(120, 120, 120)
+		},
+		Red = {
+			accent     = f(220, 40, 40),
+			risky      = f(220, 40, 40),
+			background = f(30, 28, 28),
+			outline    = f(55, 44, 44),
+			active     = f(255, 255, 255),
+			inactive   = f(130, 110, 110)
+		},
+		Mono = {
+			accent     = f(220, 220, 220),
+			risky      = f(200, 0, 0),
+			background = f(18, 18, 18),
+			outline    = f(42, 42, 42),
+			active     = f(255, 255, 255),
+			inactive   = f(100, 100, 100)
+		}
+	},
+	currentTheme = "Blue",
+	instancemap = {},
+	notifications = {};
+	keys = {
+		[Enum.KeyCode.LeftShift] = "L-SHIFT",
+		[Enum.KeyCode.RightShift] = "R-SHIFT",
+		[Enum.KeyCode.LeftControl] = "L-CTRL",
+		[Enum.KeyCode.RightControl] = "R-CTRL",
+		[Enum.KeyCode.LeftAlt] = "L-ALT",
+		[Enum.KeyCode.RightAlt] = "R-ALT",
+		[Enum.KeyCode.Insert] = "INSERT",
+		[Enum.KeyCode.End] = "END",
+		[Enum.KeyCode.PageUp] = "PGUP",
+		[Enum.KeyCode.Delete] = "DELETE",
+		[Enum.KeyCode.Home] = "HOME",
+		[Enum.KeyCode.PageDown] = "PGDN",
+		[Enum.UserInputType.MouseButton1] = "MB1",
+		[Enum.UserInputType.MouseButton2] = "MB2",
+		[Enum.UserInputType.MouseButton3] = "MB3"
+	},
+	un_named_flags = 0,
+	page_amount = 0,
+	pages = {},
+	sections = {},
+	flags = {},
+	language = "English",
+	user_data = {
+		username = (n or "User"),
+		uid = 1
+	},
+	shared = {
+		initialized = false,
+		fps = 0,
+		ping = 0
+	}
+})
+function n:LoadTheme(themeName)
+	if not self.themes[themeName] then return end
+	self.currentTheme = themeName
+	local theme = self.themes[themeName]
+	-- переприменяем цвета ко всем зарегистрированным instance
+	for inst, data in pairs(self.instancemap) do
+		if inst and inst.Parent then
+			for prop, colorKey in pairs(data.Properties) do
+				local color = theme[colorKey]
+				if color then
+					inst[prop] = color
+				end
+			end
+		end
+	end
+end;
+function n:AttachTheme(inst, props)
+	local theme = self.themes[self.currentTheme or "Blue"]
+	if not theme then return end
+	self.instancemap[inst] = { Instance = inst, Properties = props }
+	for prop, colorKey in pairs(props) do
+		local color = theme[colorKey]
+		if color then
+			inst[prop] = color
+		end
+	end
+end;
+function n:GetSelectedThemeAndAccent()
+	local name  = self.currentTheme or "Blue"
+	local theme = self.themes[name]
+	return name, theme and theme.accent
+end;
+local p = {}
+n.__index = n;
+n.pages.__index = n.pages;
+n.sections.__index = n.sections;
+local q;
+local r;
+local s = false;
+do
+	function n.next_flag()
+		n.un_named_flags = n.un_named_flags + 1;
+		return string.format("%.14g", n.un_named_flags)
+	end;
+	function n:RGBA(a, b, d, e)
+		local a = Color3.fromRGB(a, b, d)
+		local b = table.clone(getrawmetatable(a))
+		setreadonly(b, false)
+		local d = b.__index;
+		b.__index = newcclosure(function(a, b)
+			if b:lower() == "transparency" then
+				return e
+			end;
+			return d(a, b)
+		end)
+		setrawmetatable(a, b)
+		return a
+	end;
+	function n:GetConfig()
+		local a = ""
+		for b, d in pairs(self.flags) do
+			if b ~= "ConfigConfig_List" and b ~= "ConfigConfig_Load" and b ~= "ConfigConfig_Save" then
+				local e = d;
+				local f = ""
+				if typeof(e) == "Color3" then
+					local a, b, d = e:ToHSV()
+					f = ("rgb(%s,%s,%s,%s)"):format(a, b, d, 1)
+				elseif typeof(e) == "table" and e.Color and e.Transparency then
+					local a, b, d = e.Color:ToHSV()
+					f = ("rgb(%s,%s,%s,%s)"):format(a, b, d, e.Transparency)
+				elseif typeof(e) == "table" and d.Mode then
+					local a = d.current;
+					f = ("key(%s,%s,%s)"):format(a[1] or "nil", a[2] or "nil", d.Mode)
+				elseif e ~= nil then
+					if typeof(e) == "boolean" then
+						e = ("bool(%s)"):format(tostring(e))
+					elseif typeof(e) == "table" then
+						local a = "table("
+						for b, b in pairs(e) do
+							a = a .. b .. ","
+						end;
+						if a:sub(# a) == "," then
+							a = a:sub(0, # a - 1)
+						end;
+						e = a .. ")"
+					elseif typeof(e) == "string" then
+						e = ("string(%s)"):format(e)
+					elseif typeof(e) == "number" then
+						e = ("number(%s)"):format(e)
+					end;
+					f = e
+				end;
+				a = a .. b .. ": " .. tostring(f) .. "\n"
+			end
+		end;
+		return a
+	end;
+	function n:LoadConfig(a)
+		local a = string.split(a, "\n")
+		local b = {}
+		for a, a in pairs(a) do
+			local a = string.split(a, ":")
+			if a[1] ~= "ConfigConfig_List" and # a >= 2 then
+				local d = a[2]:sub(2, # a[2])
+				if d:sub(1, 3) == "rgb" then
+					local a = string.split(d:sub(5, # d - 1), ",")
+					d = a
+				elseif d:sub(1, 3) == "key" then
+					local a = string.split(d:sub(5, # d - 1), ",")
+					if a[1] == "nil" and a[2] == "nil" then
+						a[1] = nil;
+						a[2] = nil
+					end;
+					d = a
+				elseif d:sub(1, 4) == "bool" then
+					local a = d:sub(6, # d - 1)
+					d = a == "true"
+				elseif d:sub(1, 5) == "table" then
+					local a = string.split(d:sub(7, # d - 1), ",")
+					d = a
+				elseif d:sub(1, 6) == "string" then
+					local a = d:sub(8, # d - 1)
+					d = a
+				elseif d:sub(1, 6) == "number" then
+					local a = tonumber(d:sub(8, # d - 1))
+					d = a
+				end;
+				b[a[1]] = d
+			end
+		end;
+		for a, b in pairs(b) do
+			if p[a] then
+				if typeof(p[a]) == "table" then
+					p[a]:Set(b)
+				else
+					p[a](b)
+				end
+			end
+		end
+	end;
+	function n:IsMouseOverFrame(a)
+		local a, b = a.AbsolutePosition, a.AbsoluteSize;
+		if m.X >= a.X and m.X <= a.X + b.X and m.Y >= a.Y and m.Y <= a.Y + b.Y then
+			return true
+		end
+	end;
+	r = cloneref(Instance.new("BlurEffect", g))
+	q = Instance_manager.new("TextButton", {
+		Name = "bg_effect";
+		Text = "";
+		AutoButtonColor = false;
+		Size = b(9999, 0, 9999, 0);
+		BorderColor3 = n.themes.outline;
+		Position = b(0, 0, 0, -100);
+		ZIndex = -9999;
+		BackgroundColor3 = f(0, 0, 0);
+		Visible = n.autoload;
+		BackgroundTransparency = 0.35;
+		Parent = cloneref(Instance.new("ScreenGui", gethui()))
+	})
+end;
+do
+	function n:Notification(a, b, d, e)
+		local f = {
+			Container = nil,
+			Objects = {}
+		}
+		local g = cloneref(Instance.new("ScreenGui", gethui()))
+		local h = Instance.new('Frame', g)
+		local j = Instance.new("Frame")
+		local l = Instance.new("Frame")
+		local m = Instance.new("TextLabel")
+		local o = Instance.new("UIPadding")
+		local p = Instance.new("Frame")
+		local q = Vector2.new(25, 65)
+		local r = Instance.new("ImageLabel")
+		do
+			g.Name = "notification"
+			g.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+			g.IgnoreGuiInset = Enum.ScreenInsets.DeviceSafeInsets;
+			g.IgnoreGuiInset = true;
+			n.noti_screen_gui = g;
+			h.Name = "container"
+			h.Position = UDim2.new(0, q.X, 0, q.Y + (# n.notifications * 25))
+			h.AutomaticSize = Enum.AutomaticSize.X;
+			h.Size = UDim2.new(0, 0, 0, 18)
+			h.BackgroundColor3 = Color3.new(1, 1, 1)
+			h.BackgroundTransparency = 1;
+			h.BorderSizePixel = 0;
+			h.BorderColor3 = Color3.new(0, 0, 0)
+			h.ZIndex = 99999999;
+			f.Container = h;
+			j.Name = "outline"
+			j.AutomaticSize = Enum.AutomaticSize.X;
+			j.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			j.Position = UDim2.new(0.01, 0, 0.02, 0)
+			j.Size = UDim2.new(0, 0, 0, 18)
+			j.Parent = h;
+			j.BackgroundTransparency = 1;
+			table.insert(f.Objects, j)
+			n:AttachTheme(j, {
+				BackgroundColor3 = "background"
+			})
+			l.Name = "inline"
+			l.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+			l.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			l.BorderSizePixel = 0;
+			l.Position = UDim2.new(0, 1, 0, 0)
+			l.Size = UDim2.new(1, 0, 1, -1)
+			l.BackgroundTransparency = 1;
+			l.Parent = j;
+			table.insert(f.Objects, l)
+			if e then
+				local a = i:GetUserThumbnailAsync(e.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+				r.Image = a;
+				r.Size = UDim2.new(0, 14, 0, 14)
+				r.Position = UDim2.new(0, 4, 0.8, -13)
+				r.BackgroundTransparency = 1;
+				r.Parent = l;
+				m.Position = UDim2.new(0, 20, 0, 0)
+				table.insert(f.Objects, r)
+			end;
+			m.Name = "text"
+			m.Text = a;
+			m.TextColor3 = Color3.fromRGB(255, 255, 255)
+			m.TextStrokeTransparency = 0;
+			m.TextXAlignment = Enum.TextXAlignment.Left;
+			m.AutomaticSize = Enum.AutomaticSize.X;
+			m.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+			m.BackgroundTransparency = 1;
+			m.Size = UDim2.new(0, 0, 1, 0)
+			m.TextTransparency = 1;
+			m.Parent = l;
+			m.FontFace = n.font;
+			m.TextSize = n.font_size;
+			table.insert(f.Objects, m)
+			o.Name = "uipadding"
+			o.PaddingLeft = UDim.new(0, 5)
+			o.PaddingRight = UDim.new(0, 5)
+			o.PaddingTop = UDim.new(0, 1)
+			o.Parent = m;
+			p.Name = "timeline"
+			p.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			p.BorderSizePixel = 0;
+			p.Size = UDim2.new(0, 0, 1, 0)
+			p.Parent = j;
+			p.BackgroundTransparency = 1;
+			p.BackgroundColor3 = d;
+			p.ZIndex = -1
+			table.insert(f.Objects, p)
+		end;
+		function f:remove()
+			local a = table.find(n.notifications, f)
+			if a then
+				for a, a in ipairs(f.Objects) do
+					if a:IsA("Frame") or a:IsA("ImageLabel") then
+						k:Create(a, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+							BackgroundTransparency = 1
+						}):Play()
+					elseif a:IsA("TextLabel") then
+						k:Create(a, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+							TextTransparency = 1
+						}):Play()
+					end
+				end;
+				task.wait(0.5)
+				table.remove(n.notifications, table.find(n.notifications, f))
+				g:Destroy()
+				f.Container:Destroy()
+				for a = a, # n.notifications do
+					local b = n.notifications[a]
+					local a = UDim2.new(0, q.X, 0, q.Y + (a - 1) * 25)
+					k:Create(b.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Position = a
+					}):Play()
+				end
+			end
+		end;
+		task.spawn(function()
+			j.AnchorPoint = Vector2.new(1, 0)
+			for a, a in next, f.Objects do
+				if a:IsA("Frame") then
+					k:Create(a, TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+						BackgroundTransparency = 0
+					}):Play()
+				elseif a:IsA("ImageLabel") then
+					k:Create(a, TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+						BackgroundTransparency = 0
+					}):Play()
+				end
+			end;
+			k:Create(j, TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+				AnchorPoint = Vector2.new(0, 0)
+			}):Play()
+			k:Create(m, TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+				TextTransparency = 0
+			}):Play()
+			k:Create(r, TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+				ImageTransparency = 0
+			}):Play()
+			k:Create(p, TweenInfo.new(b, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+				Size = UDim2.new(1, 0, 1, 0)
+			}):Play()
+			task.wait(b)
+			f:remove()
+		end)
+		table.insert(n.notifications, f)
+		h.Position = UDim2.new(0, q.X, 0, q.Y + (# n.notifications - 1) * 25)
+		return f
+	end;
+	function n:NewPicker(a, e, g, h, i, k, l)
+		local m = Instance.new("TextButton", h)
+		local o = Instance.new("TextLabel")
+		local q = Instance.new("Frame")
+		local r = Instance.new("Frame")
+		local s = Instance.new("Frame")
+		local t = Instance.new("TextButton")
+		local u = Instance.new("TextButton")
+		local v = Instance.new("TextButton")
+		local w = Instance.new("Frame")
+		local x = Instance.new("ImageLabel")
+		local y = Instance.new("ImageLabel")
+		local z = Instance.new("Frame")
+		local A = Instance.new("ImageButton")
+		local B = Instance.new("Frame")
+		local C = Instance.new("ImageButton")
+		local D = Instance.new("Frame")
+		local E = Instance.new("TextButton")
+		local F = Instance.new("ImageLabel")
+		do
+			m.Name = "Icon_Colorpicker"
+			m.AnchorPoint = Vector2.new(0, 0.5)
+			m.BackgroundColor3 = e;
+			m.BorderColor3 = Color3.fromRGB(36, 36, 36)
+			m.BorderSizePixel = 1;
+			local g = 3;
+			if i == 1 then
+				m.Position = UDim2.new(1, - (i * 18), 0.5, 0)
+			else
+				m.Position = UDim2.new(1, - (i * 16) - (i * g), 0.5, 0)
+			end;
+			m.Size = UDim2.new(0, 16, 0, 16)
+			m.Text = ""
+			m.ZIndex = 99;
+			m.AutoButtonColor = false;
+			Instance_manager.new("UICorner", {
+				Parent = m;
+				CornerRadius = d(1, 0)
+			})
+			q.Name = "Outline"
+			q.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			q.BackgroundTransparency = 1;
+			q.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			q.BorderSizePixel = 0;
+			q.Position = UDim2.new(0, -1, 0, -1)
+			q.Size = UDim2.new(1, 2, 1, 2)
+			q.ZIndex = 99;
+			q.Parent = m;
+			r.Name = "ColorWindow"
+			r.AnchorPoint = Vector2.new(0.5, 0.5)
+			r.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			r.Parent = m;
+			r.Position = UDim2.new(1, 0, 1, 2)
+			r.AnchorPoint = Vector2.new(1, 0)
+			r.Size = UDim2.new(0, 180, 0, 220)
+			r.ZIndex = 99;
+			r.Visible = false;
+			n:AttachTheme(r, {
+				BackgroundColor3 = "outline"
+			})
+			Instance_manager.new("UICorner", {
+				Parent = r;
+				CornerRadius = d(0, 6)
+			})
+			s.Name = "ColorInline"
+			s.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			s.BorderSizePixel = 0;
+			s.Position = UDim2.new(0, 1, 0, 1)
+			s.Size = UDim2.new(1, -2, 1, -2)
+			n:AttachTheme(s, {
+				BackgroundColor3 = "background"
+			})
+			Instance_manager.new("UICorner", {
+				Parent = s;
+				CornerRadius = d(0, 6)
+			})
+			o.BackgroundTransparency = 1;
+			o.Text = a;
+			o.TextXAlignment = Enum.TextXAlignment.Left;
+			o.TextColor3 = f(255, 255, 255)
+			o.Position = b(0, 8, 0, 5)
+			o.Size = b(1, -10, 0, 20)
+			o.TextSize = n.font_size;
+			o.FontFace = n.font;
+			o.Parent = s;
+			o.TextStrokeTransparency = 0;
+			u.Name = "Text Color"
+			u.FontFace = n.font;
+			u.TextColor3 = f(155, 155, 155)
+			u.Parent = s;
+			u.TextStrokeTransparency = 0;
+			u.TextSize = n.font_size;
+			u.AutoButtonColor = false;
+			u.Position = UDim2.new(0, 7, 1, -17)
+			u.Size = UDim2.new(0, 76, 0, 12)
+			n:AttachTheme(u, {
+				BackgroundColor3 = "background"
+			})
+			n:AttachTheme(u, {
+				BorderColor3 = "outline"
+			})
+			v.Name = "Text Color 2"
+			v.FontFace = n.font;
+			v.TextColor3 = f(155, 155, 155)
+			v.Parent = s;
+			v.TextStrokeTransparency = 0;
+			v.TextSize = n.font_size;
+			v.AutoButtonColor = false;
+			v.Position = UDim2.new(0, 90, 1, -17)
+			v.Size = UDim2.new(0, 80, 0, 12)
+			n:AttachTheme(v, {
+				BackgroundColor3 = "background"
+			})
+			n:AttachTheme(v, {
+				BorderColor3 = "outline"
+			})
+			w.Name = "Outline"
+			w.BackgroundTransparency = 1;
+			w.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			w.BorderSizePixel = 0;
+			w.Position = UDim2.new(0, -1, 0, -1)
+			w.Size = UDim2.new(1, 2, 1, 2)
+			w.ZIndex = 99;
+			w.Parent = u;
+			local a = w:Clone()
+			a.Parent = v;
+			t.Name = "Color"
+			t.FontFace = n.font;
+			t.Text = ""
+			t.TextColor3 = Color3.fromRGB(0, 0, 0)
+			t.TextSize = n.font_size;
+			t.AutoButtonColor = false;
+			t.BackgroundColor3 = e;
+			t.Position = UDim2.new(0, 6, 0, 30)
+			t.Size = UDim2.new(0, 145, 1, -74)
+			n:AttachTheme(t, {
+				BorderColor3 = "background"
+			})
+			Instance_manager.new("UICorner", {
+				Parent = t;
+				CornerRadius = d(0, 7)
+			})
+			E.Name = "CircleButton"
+			E.FontFace = n.font;
+			E.Text = ""
+			E.TextColor3 = Color3.fromRGB(0, 0, 0)
+			E.TextSize = n.font_size;
+			E.AutoButtonColor = false;
+			E.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			E.Position = UDim2.new(0.5, -25, 0.5, -25)
+			E.Size = UDim2.new(0, 7, 0, 7)
+			E.Parent = t;
+			E.ZIndex = 9;
+			n:AttachTheme(E, {
+				BorderColor3 = "background"
+			})
+			Instance_manager.new("UICorner", {
+				Parent = E;
+				CornerRadius = UDim.new(1, 0)
+			})
+			x.Name = "Sat"
+			x.Image = "http://www.roblox.com/asset/?id=14684562507"
+			x.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			x.BackgroundTransparency = 1;
+			x.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			x.BorderSizePixel = 0;
+			x.Size = UDim2.new(1, 0, 1, 0)
+			x.Parent = t;
+			Instance_manager.new("UICorner", {
+				Parent = x;
+				CornerRadius = d(0, 6)
+			})
+			y.Name = "Val"
+			y.Image = "http://www.roblox.com/asset/?id=14684563800"
+			y.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			y.BackgroundTransparency = 1;
+			y.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			y.BorderSizePixel = 0;
+			y.Size = UDim2.new(1, 0, 1, 0)
+			y.Parent = t;
+			Instance_manager.new("UICorner", {
+				Parent = y;
+				CornerRadius = d(0, 6)
+			})
+			z.Name = "Outline"
+			z.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			z.BackgroundTransparency = 1;
+			z.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			z.BorderSizePixel = 0;
+			z.Position = UDim2.new(0, -1, 0, -1)
+			z.Size = UDim2.new(1, 2, 1, 2)
+			z.Parent = t;
+			t.Parent = s;
+			A.Name = "Alpha"
+			A.Image = "http://www.roblox.com/asset/?id=15486053510"
+			A.AutoButtonColor = false;
+			A.BackgroundTransparency = 1;
+			A.ImageTransparency = 0.03;
+			A.BorderSizePixel = 0;
+			A.Position = UDim2.new(1, -18, 0, 30)
+			A.Size = UDim2.new(0, 10, 1, -74)
+			A.Parent = s;
+			Instance_manager.new("UICorner", {
+				Parent = A;
+				CornerRadius = d(0, 5)
+			})
+			F.Name = "alpha_bg"
+			F.ZIndex = -1
+			F.Image = "http://www.roblox.com/asset/?id=4879903999"
+			F.BackgroundTransparency = 1;
+			F.ScaleType = Enum.ScaleType.Crop;
+			F.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			F.BorderSizePixel = 0;
+			F.Position = UDim2.new(1, -18, 0, 68)
+			F.Size = UDim2.new(0, 10, 1, -114)
+			F.Parent = s;
+			Instance_manager.new("UICorner", {
+				Parent = F;
+				CornerRadius = d(0, 5)
+			})
+			B.Name = "Outline"
+			B.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			B.BackgroundTransparency = 1;
+			B.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			B.BorderSizePixel = 0;
+			B.Position = UDim2.new(0, -1, 0, -1)
+			B.Size = UDim2.new(1, 2, 1, 2)
+			B.Parent = A;
+			C.Name = "Hue"
+			C.Image = "http://www.roblox.com/asset/?id=138435236878653"
+			C.AutoButtonColor = false;
+			C.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+			C.BorderColor3 = Color3.fromRGB(17, 17, 17)
+			C.Position = UDim2.new(0, 7, 1, -35)
+			C.Size = UDim2.new(0, 164, 0, 10)
+			Instance_manager.new("UICorner", {
+				Parent = C;
+				CornerRadius = d(0, 5)
+			})
+			D.Name = "Outline"
+			D.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			D.BackgroundTransparency = 1;
+			D.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			D.BorderSizePixel = 0;
+			D.Position = UDim2.new(0, -1, 0, -1)
+			D.Size = UDim2.new(1, 2, 1, 2)
+			D.Parent = C;
+			C.Parent = s;
+			s.Parent = r
+		end;
+		local a = false;
+		local a, b, d = e:ToHSV()
+		local f = e:ToHSV()
+		local i = g;
+		local o = f;
+		local o = false;
+		local q = false;
+		local s = false;
+		local function w()
+			local e = j:GetMouseLocation()
+			local e = Vector2.new(e.X - 3, e.Y - 55)
+			local g = (e - t.AbsolutePosition)
+			local h = (e - C.AbsolutePosition)
+			local e = (e - A.AbsolutePosition)
+			if o then
+				b = math.clamp(1 - g.X / t.AbsoluteSize.X, 0, 1)
+				d = math.clamp(1 - g.Y / t.AbsoluteSize.Y, 0, 1)
+			elseif q then
+				a = math.clamp(1 - (h.X / C.AbsoluteSize.X), 0, 1)
+			elseif s then
+				i = math.clamp(e.X / A.AbsoluteSize.X, 0, 1)
+			end;
+			f = Color3.fromHSV(a, b, d)
+			t.BackgroundColor3 = Color3.fromHSV(a, 1, 1)
+			m.BackgroundColor3 = f;
+			E.Position = UDim2.new(1 - b, 0, 1 - d, -5)
+			if k then
+				n.flags[k] = n:RGBA(f.r * 255, f.g * 255, f.b * 255, i)
+			end;
+			local a, b, d = math.floor(f.r * 255), math.floor(f.g * 255), math.floor(f.b * 255)
+			local e = Color3.fromRGB(a, b, d)
+			A.ImageColor3 = e;
+			u.Text = string.format("#%02x%02x%02x", a, b, d)
+			v.Text = string.format("%d, %d, %d", a, b, d)
+			l(n:RGBA(f.r * 255, f.g * 255, f.b * 255, i))
+		end;
+		local function y(e, g)
+			if type(e) == "table" then
+				g = e[4]
+				e = Color3.fromHSV(e[1], e[2], e[3])
+			end;
+			if type(e) == "string" then
+				e = Color3.fromHex(e)
+			end;
+			local h = f;
+			local j = i;
+			a, b, d = e:ToHSV()
+			i = g or 1;
+			f = Color3.fromHSV(a, b, d)
+			if f ~= h then
+				m.BackgroundColor3 = f;
+				t.BackgroundColor3 = Color3.fromHSV(a, 1, 1)
+				local a, b, d = math.floor(f.r * 255), math.floor(f.g * 255), math.floor(f.b * 255)
+				local e = Color3.fromRGB(a, b, d)
+				A.ImageColor3 = e;
+				u.Text = string.format("#%02x%02x%02x", a, b, d)
+				v.Text = string.format("%d, %d, %d", a, b, d)
+				if k then
+					n.flags[k] = n:RGBA(f.r * 255, f.g * 255, f.b * 255, i)
+				end;
+				l(n:RGBA(f.r * 255, f.g * 255, f.b * 255, i))
+			end
+		end;
+		p[k] = y;
+		y(e, g)
+		x.InputBegan:Connect(function(a)
+			if a.UserInputType == Enum.UserInputType.MouseButton1 then
+				o = true;
+				w()
+			end
+		end)
+		x.InputEnded:Connect(function(a)
+			if a.UserInputType == Enum.UserInputType.MouseButton1 then
+				o = false;
+				w()
+			end
+		end)
+		C.InputBegan:Connect(function(a)
+			if a.UserInputType == Enum.UserInputType.MouseButton1 then
+				q = true;
+				w()
+			end
+		end)
+		C.InputEnded:Connect(function(a)
+			if a.UserInputType == Enum.UserInputType.MouseButton1 then
+				q = false;
+				w()
+			end
+		end)
+		A.InputBegan:Connect(function(a)
+			if a.UserInputType == Enum.UserInputType.MouseButton1 then
+				s = true;
+				w()
+			end
+		end)
+		A.InputEnded:Connect(function(a)
+			if a.UserInputType == Enum.UserInputType.MouseButton1 then
+				s = false;
+				w()
+			end
+		end)
+		signals.connection(j.InputChanged, function(a)
+			if a.UserInputType == Enum.UserInputType.MouseMovement then
+				if s then
+					w()
+				end;
+				if q then
+					w()
+				end;
+				if o then
+					w()
+				end
+			end
+		end)
+		local a = {}
+		function a:Set(a, b)
+			y(a, b)
+		end;
+		signals.connection(j.InputBegan, function(a)
+			if r.Visible and a.UserInputType == Enum.UserInputType.MouseButton1 then
+				if not n:IsMouseOverFrame(r) and not n:IsMouseOverFrame(m) and not n:IsMouseOverFrame(h) then
+					r.Visible = false;
+					h.ZIndex = 1
+				end
+			end
+		end)
+		m.MouseButton1Down:Connect(function()
+			r.Visible = true;
+			h.ZIndex = 5;
+			if q then
+				q = false
+			end;
+			if o then
+				o = false
+			end;
+			if s then
+				s = false
+			end
+		end)
+		return a, r
+	end;
+	local a = n.pages;
+	local g = n.sections;
+	function n:window(a)
+		local a = {
+			name = (a.Name or a.name or "visual enhancements");
+			size = (a.Size or a.size or b(0, 770, 0, 500));
+			position = (a.position == "left" and Enum.TextXAlignment.Left) or (a.position == "center" and Enum.TextXAlignment.Center) or (a.position == "right" and Enum.TextXAlignment.Right) or Enum.TextXAlignment.Left,
+			dragging = {
+				false,
+				b(0, 0, 0, 0)
+			};
+			page_amount = a.Amount or a.amount or 5;
+			elements = {};
+			sections = {};
+			pages = {}
+		}
+		n.corner_image = nil;
+		n.current_bg_url = "https://i.imgur.com/ShbiIF3.png"
+		function n:UpdateBackgroundImage(a)
+			if not a or a == "" then
+				if self.corner_image then
+					self.corner_image:Destroy()
+					self.corner_image = nil
+				end;
+				return
+			end;
+			local function b(a)
+				local a = a:gsub("https?://", "")
+				a = a:gsub("[^%w]", "_")
+				return a .. ".png"
+			end;
+			local b = b(a)
+			if not isfile(b) then
+				local a, d = pcall(request, {
+					Url = a,
+					Method = "GET"
+				})
+				if a and d and d.Body then
+					writefile(b, d.Body)
+				else
+					if self.Notification then
+						self:Notification("Failed to download image", 3, Color3.fromRGB(255, 0, 0))
+					end;
+					return
+				end
+			end;
+			local d = getsynasset or getcustomasset;
+			if d and isfile(b) then
+				if self.corner_image then
+					self.corner_image:Destroy()
+				end;
+				self.corner_image = Instance.new("ImageLabel")
+				self.corner_image.Name = "corner_image"
+				self.corner_image.Parent = self.menu_gui;
+				self.corner_image.BackgroundTransparency = 1;
+				self.corner_image.Size = UDim2.fromOffset(800, 580)
+				self.corner_image.AnchorPoint = Vector2.new(1, 1)
+				self.corner_image.Position = UDim2.fromScale(1, 1)
+				self.corner_image.Image = d(b)
+				self.corner_image.ZIndex = 10000;
+				self.current_bg_url = a;
+				if self.Notification then
+					self:Notification("Background updated", 3, Color3.fromRGB(0, 255, 0))
+				end
+			end
+		end;
+		local d = Instance_manager.new("ScreenGui", {
+			Name = "visual menu";
+			Parent = cloneref(gethui());
+			IgnoreGuiInset = Enum.ScreenInsets.DeviceSafeInsets;
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+			DisplayOrder = 10
+		})
+		n.menu_gui = d;
+		local d = Instance_manager.new("TextButton", {
+			Name = "background";
+			Parent = d;
+			Text = "";
+			AutoButtonColor = false;
+			AnchorPoint = e(0.5, 0.5);
+			Position = b(0.5, 0, 0.5, 0);
+			BorderSizePixel = 1;
+			Size = a.size;
+			ZIndex = 9999
+		})
+		n:AttachTheme(d, {
+			BackgroundColor3 = "background"
+		})
+		n:AttachTheme(d, {
+			BorderColor3 = "outline"
+		})
+		local e = Instance_manager.new("Frame", {
+			Name = "background2";
+			Parent = d;
+			AnchorPoint = e(0.5, 0.5);
+			Position = b(0.5, 0, 0.5, 0);
+			Size = b(1, 0, 1, 0);
+			BorderColor3 = Color3.fromRGB(40, 40, 40);
+			BorderSizePixel = 2;
+			ZIndex = -1
+		})
+		n:UpdateBackgroundImage(n.current_bg_url)
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		-- логотип вынесен в отдельный ScreenGui — правый верхний угол
+		do
+			local logoGui = cloneref(Instance.new("ScreenGui", gethui()))
+			logoGui.Name = "synapse_logo_gui"
+			logoGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			logoGui.IgnoreGuiInset = true
+			logoGui.DisplayOrder = 20
+			n.logo_gui = logoGui
+			local logoImg = Instance.new("ImageLabel", logoGui)
+			logoImg.Name = "logo"
+			logoImg.AnchorPoint = Vector2.new(1, 0)
+			logoImg.Position = UDim2.new(1, -12, 0, 12)
+			logoImg.Size = UDim2.fromOffset(64, 64)
+			logoImg.BackgroundTransparency = 1
+			logoImg.BorderSizePixel = 0
+			logoImg.Image = "rbxassetid://128100063496438"
+			logoImg.ZIndex = 9999
+			n:AttachTheme(logoImg, { ImageColor3 = "accent" })
+			n.logo_img = logoImg
+		end
+		local e = Instance_manager.new("Frame", {
+			Name = "tabs_holder";
+			BackgroundTransparency = 1;
+			BorderColor3 = f(0, 0, 0);
+			BorderSizePixel = 0;
+			Position = b(0, 0, 0, 5);
+			Size = b(1, 0, 0, 60);
+			Parent = d
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		local f = Instance_manager.new("Frame", {
+			Name = "page_holder";
+			BackgroundColor3 = f(255, 255, 255);
+			BackgroundTransparency = 1;
+			BorderColor3 = f(255, 255, 255);
+			BorderSizePixel = 0;
+			Position = b(0, 10, 0, 75);
+			Size = b(1, -20, 1, -85);
+			Parent = d
+		})
+		a.elements = {
+			tab_holder = e,
+			holder = f,
+			base = d
+		}
+		function a:update_tabs()
+			for a, a in pairs(a.pages) do
+				a:Turn(a.open)
+			end
+		end;
+		do
+			signals.connection(d.InputBegan, function(b)
+				if b.UserInputType == Enum.UserInputType.MouseButton1 then
+					a.dragging[1], a.dragging[2] = true, j:GetMouseLocation()
+				end
+			end)
+			signals.connection(j.InputEnded, function(b)
+				if b.UserInputType == Enum.UserInputType.MouseButton1 then
+					a.dragging[1] = false
+				end
+			end)
+			signals.connection(j.InputChanged, function(e)
+				if a.dragging[1] and e.UserInputType == Enum.UserInputType.MouseMovement then
+					local e = j:GetMouseLocation()
+					local f = math.clamp(d.Position.X.Offset + (e.X - a.dragging[2].X), - l.X / 2 + d.AbsoluteSize.X / 2, l.X / 2 - d.AbsoluteSize.X / 2)
+					local g = math.clamp(d.Position.Y.Offset + (e.Y - a.dragging[2].Y), - l.Y / 2 + d.AbsoluteSize.Y / 2, l.Y / 2 - d.AbsoluteSize.Y / 2)
+					d.Position = b(d.Position.X.Scale, f, d.Position.Y.Scale, g)
+					a.dragging[2] = e
+				end
+			end)
+		end;
+		function a:keybind_list()
+			local a = {
+				Keybinds = {}
+			}
+			n.keybind_list = a;
+			local b = cloneref(Instance.new("ScreenGui", gethui()))
+			local d = Instance.new("Frame")
+			local e = Instance.new("Frame")
+			local f = Instance.new("Frame")
+			local g = Instance.new("TextLabel")
+			local h = Instance.new("Frame")
+			local i = Instance.new("UIListLayout")
+			b.Name = "KeyBind List"
+			b.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+			b.IgnoreGuiInset = Enum.ScreenInsets.DeviceSafeInsets;
+			b.DisplayOrder = 10;
+			n.keybind_screen_gui = b;
+			d.Name = "Background"
+			d.BorderColor3 = Color3.fromRGB(11, 11, 11)
+			d.BorderSizePixel = 2;
+			d.Position = UDim2.new(0.01, 0, 0.488, 0)
+			d.Size = UDim2.new(0, 164, 0, 24)
+			d.Visible = false;
+			d.AutomaticSize = Enum.AutomaticSize.XY;
+			d.Parent = b;
+			local b = Instance.new("UIStroke")
+			b.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual;
+			b.Color = Color3.fromRGB(71, 71, 71)
+			b.Thickness = 1;
+			b.Parent = d;
+			n:AttachTheme(d, {
+				BackgroundColor3 = "background"
+			})
+			do
+				local a = {
+					false,
+					j:GetMouseLocation()
+				}
+				signals.connection(d.InputBegan, function(b)
+					if b.UserInputType == Enum.UserInputType.MouseButton1 then
+						a[1], a[2] = true, j:GetMouseLocation()
+					end
+				end)
+				signals.connection(j.InputEnded, function(b)
+					if b.UserInputType == Enum.UserInputType.MouseButton1 then
+						a[1] = false
+					end
+				end)
+				signals.connection(j.InputChanged, function(b)
+					if a[1] and b.UserInputType == Enum.UserInputType.MouseMovement then
+						local b = j:GetMouseLocation()
+						local e = Vector2.new(b.X - a[2].X, b.Y - a[2].Y)
+						local e = UDim2.new(d.Position.X.Scale, d.Position.X.Offset + e.X, d.Position.Y.Scale, d.Position.Y.Offset + e.Y)
+						d.Position = e;
+						a[2] = b
+					end
+				end)
+			end;
+			e.Name = "TopLine"
+			e.BorderColor3 = Color3.fromRGB(25, 25, 25)
+			e.Position = UDim2.new(0, 0, 0, 0)
+			e.Size = UDim2.new(1, 0, 0, 1)
+			e.Visible = true;
+			e.AutomaticSize = Enum.AutomaticSize.XY;
+			e.Parent = d;
+			n:AttachTheme(e, {
+				BackgroundColor3 = "accent"
+			})
+			f.Name = "Name_Holder"
+			f.BackgroundTransparency = 1;
+			f.Position = UDim2.new(0, 0, 0, 0)
+			f.Visible = true;
+			f.Size = UDim2.new(0, 170, 0.4, 0)
+			f.AutomaticSize = Enum.AutomaticSize.XY;
+			f.Parent = d;
+			g.Name = "Name_List"
+			g.Parent = f;
+			g.BackgroundTransparency = 1;
+			g.BorderColor3 = Color3.fromRGB(25, 25, 25)
+			g.BorderSizePixel = 0;
+			g.Size = UDim2.new(1, 0, 0, 25)
+			g.FontFace = n.font;
+			g.Text = "KeyBind List"
+			g.TextStrokeTransparency = 0;
+			g.TextColor3 = Color3.fromRGB(255, 255, 255)
+			g.TextSize = n.font_size;
+			g.RichText = true;
+			h.Name = "Tab"
+			h.Visible = true;
+			h.Parent = d;
+			h.BackgroundTransparency = 1.000;
+			h.BorderColor3 = Color3.fromRGB(25, 25, 25)
+			h.Position = UDim2.new(0, 0, 0, 25)
+			h.Size = UDim2.new(1, 0, 0, -20)
+			h.AutomaticSize = Enum.AutomaticSize.Y;
+			n:AttachTheme(h, {
+				BackgroundColor3 = "background"
+			})
+			i.Parent = h;
+			i.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+			i.SortOrder = Enum.SortOrder.LayoutOrder;
+			i.Padding = UDim.new(0, 5)
+			function a:SetVisible(a)
+				d.Visible = a
+			end;
+			function a:NewKey(keyText, bindName)
+				local label = Instance.new("TextLabel")
+				local api   = {}
+				label.Name                = "Name"
+				label.Parent              = h
+				label.BackgroundTransparency = 1
+				label.BorderSizePixel     = 0
+				label.FontFace            = n.font
+				label.TextColor3          = Color3.fromRGB(180, 180, 180)
+				label.TextStrokeTransparency = 0
+				label.TextSize            = n.font_size
+				label.AutomaticSize       = Enum.AutomaticSize.XY
+				label.Size                = UDim2.new(0, 0, 0, 0)
+				-- по умолчанию скрыт: показывается только когда бинд назначен
+				label.Visible = false
+
+				function api:SetVisible(v)
+					-- игнорируем внешние вызовы SetVisible(false) если бинд назначен —
+					-- видимость управляется только через Update
+				end
+				-- подсветка: активен → акцент, неактивен → серый
+				function api:SetActive(isActive)
+					local theme = n.themes[n.currentTheme or "Blue"]
+					label.TextColor3 = isActive and theme.accent or Color3.fromRGB(180, 180, 180)
+				end
+				-- Update вызывается при смене клавиши
+				-- keyStr = "None" или nil → скрыть строку
+				-- иначе — показать с текстом "Name: [KEY]"
+				function api:Update(keyStr, name)
+					local noKey = (keyStr == nil or keyStr == "None" or keyStr == "")
+					label.Visible = not noKey
+					if not noKey then
+						label.Text = string.format("%s: [%s]", name or bindName or "", tostring(keyStr))
+					end
+				end
+				return api
+			end;
+			return a
+		end;
+		a:keybind_list()
+		n.holder = d;
+		n.page_amount = a.page_amount;
+		function a:watermark()
+			local a = {
+				Watermark = {}
+			}
+			n.watermark = a;
+			local b = cloneref(Instance.new("ScreenGui", gethui()))
+			b.Name = "watermark"
+			b.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+			b.IgnoreGuiInset = Enum.ScreenInsets.DeviceSafeInsets;
+			b.DisplayOrder = 999;
+			b.Enabled = false;
+			n.watermark_gui = b;
+			local d = Instance.new("Frame")
+			d.Name = "watermark_frame"
+			d.Parent = b;
+			d.Position = UDim2.new(0, 10, 0, 10)
+			d.Size = UDim2.new(0, 120, 0, 28)
+			d.BackgroundTransparency = 0;
+			d.BorderSizePixel = 0;
+			d.AutomaticSize = Enum.AutomaticSize.X;
+			local e = Instance.new("UIStroke")
+			e.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual;
+			e.Color = Color3.fromRGB(71, 71, 71)
+			e.Thickness = 1;
+			e.Parent = d;
+			local e = Instance.new("UICorner")
+			e.CornerRadius = UDim.new(0, 1)
+			e.Parent = d;
+			n:AttachTheme(d, {
+				BackgroundColor3 = "background"
+			})
+			local e = Instance.new("UIPadding")
+			e.PaddingLeft = UDim.new(0, 10)
+			e.PaddingRight = UDim.new(0, 10)
+			e.PaddingTop = UDim.new(0, 2)
+			e.PaddingBottom = UDim.new(0, 2)
+			e.Parent = d;
+			local e = Instance.new("UIListLayout")
+			e.Parent = d;
+			e.FillDirection = Enum.FillDirection.Horizontal;
+			e.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+			e.VerticalAlignment = Enum.VerticalAlignment.Center;
+			e.SortOrder = Enum.SortOrder.LayoutOrder;
+			e.Padding = UDim.new(0, 8)
+			signals.connection(e:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+				d.Size = UDim2.new(0, e.AbsoluteContentSize.X + 20, 0, 28)
+			end)
+			do
+				local a = {
+					false,
+					j:GetMouseLocation()
+				}
+				signals.connection(d.InputBegan, function(b)
+					if b.UserInputType == Enum.UserInputType.MouseButton1 then
+						a[1], a[2] = true, j:GetMouseLocation()
+					end
+				end)
+				signals.connection(j.InputEnded, function(b)
+					if b.UserInputType == Enum.UserInputType.MouseButton1 then
+						a[1] = false
+					end
+				end)
+				signals.connection(j.InputChanged, function(b)
+					if a[1] and b.UserInputType == Enum.UserInputType.MouseMovement then
+						local b = j:GetMouseLocation()
+						local e = Vector2.new(b.X - a[2].X, b.Y - a[2].Y)
+						local e = UDim2.new(d.Position.X.Scale, d.Position.X.Offset + e.X, d.Position.Y.Scale, d.Position.Y.Offset + e.Y)
+						d.Position = e;
+						a[2] = b
+					end
+				end)
+			end;
+			local e = {}
+			local function f(a, b, e)
+				local f = Instance.new("ImageLabel")
+				f.Name = a;
+				f.Parent = d;
+				f.BackgroundTransparency = 1;
+				f.Size = UDim2.new(0, 20, 0, 20)
+				f.Image = b;
+				f.LayoutOrder = e;
+				f.ScaleType = Enum.ScaleType.Fit;
+				return f
+			end;
+			local function g(a, b, e, f)
+				local g = Instance.new("TextLabel")
+				g.Name = a;
+				g.Parent = d;
+				g.BackgroundTransparency = 1;
+				g.Size = UDim2.new(0, 0, 1, 0)
+				g.AutomaticSize = Enum.AutomaticSize.X;
+				g.FontFace = f and Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Bold) or n.font;
+				g.TextSize = f and 18 or n.font_size;
+				g.TextStrokeTransparency = f and 0.3 or 0.5;
+				g.Text = b;
+				g.LayoutOrder = e;
+				g.RichText = true;
+				n:AttachTheme(g, {
+					TextColor3 = "accent"
+				})
+				return g
+			end;
+			local function h(a, b)
+				local e = Instance.new("TextLabel")
+				e.Name = a;
+				e.Parent = d;
+				e.BackgroundTransparency = 1;
+				e.Size = UDim2.new(0, 0, 1, 0)
+				e.AutomaticSize = Enum.AutomaticSize.X;
+				e.FontFace = n.font;
+				e.TextColor3 = Color3.fromRGB(80, 80, 80)
+				e.TextSize = n.font_size;
+				e.Text = "|"
+				e.LayoutOrder = b;
+				return e
+			end;
+			e.brand = f("BrandImage", "rbxassetid://128100063496438", 1)
+			e.sep1 = h("Sep1", 2)
+			e.fps = g("FpsText", "FPS: 60", 3, false)
+			e.sep2 = h("Sep2", 4)
+			e.ping = g("PingText", "Ping: 0ms", 5, false)
+			e.sep3 = h("Sep3", 6)
+			e.time = g("TimeText", "00:00:00", 7, false)
+			e.sep4 = h("Sep4", 8)
+			e.user = g("UserText", game.Players.LocalPlayer.Name, 9, false)
+			local f = 0;
+			local g = 0;
+			local h = 60;
+			signals.connection(game:GetService("RunService").RenderStepped, function(a)
+				g = g + 1;
+				local a = tick()
+				if a - f >= 0.5 then
+					h = math.floor(g / (a - f))
+					g = 0;
+					f = a;
+					e.fps.Text = "FPS: " .. h;
+					local a, b = pcall(function()
+						return math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
+					end)
+					local a = a and b or 0;
+					e.ping.Text = "Ping: " .. a .. "ms"
+					local a = os.date("*t")
+					e.time.Text = string.format("%02d:%02d:%02d", a.hour, a.min, a.sec)
+				end
+			end)
+			function a:SetVisible(a)
+				b.Enabled = a
+			end;
+			function a:SetImage(a)
+				e.brand.Image = a
+			end;
+			function a:SetSize(a)
+				d.Size = a
+			end;
+			return a
+		end;
+		a:watermark()
+		return setmetatable(a, n)
+	end;
+	function n:tabs(a)
+		if not a then
+			a = {}
+		end;
+		local a = {
+			name = a.Name or a.name or "page",
+			scrollable = a.Scrollable or a.scrollable,
+			window = self,
+			open = false,
+			sections = {},
+			pages = {},
+			elements = {},
+			icon = a.icon or a.Icon or "",
+			size = a.size or a.Size or b(0, 20, 0, 20)
+		}
+		if (not a.window.elements.tab_holder:FindFirstChild("UIListLayout")) then
+			Instance_manager.new("UIListLayout", {
+				Name = "UIListLayout";
+				Padding = d(0, 2);
+				SortOrder = Enum.SortOrder.LayoutOrder;
+				FillDirection = Enum.FillDirection.Horizontal;
+				VerticalAlignment = Enum.VerticalAlignment.Center;
+				HorizontalAlignment = Enum.HorizontalAlignment.Center;
+				Parent = a.window.elements.tab_holder
+			})
+		end;
+		local e = Instance_manager.new("TextButton", {
+			Name = a.name;
+			AutoButtonColor = false;
+			BackgroundTransparency = 0;
+			BorderSizePixel = 0;
+			Position = b(0, 0, 0, 0);
+			Size = b(0, 0, 1, -10),  -- ширина по содержимому
+			Text = "";
+			Parent = a.window.elements.tab_holder
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		local g = Instance_manager.new("ImageLabel", {
+			Name = a.name;
+			Image = a.icon;
+			BackgroundTransparency = 1;
+			BorderSizePixel = 0;
+			AnchorPoint = Vector2.new(0, 0.5);
+			Position = b(0, 5, 0.5, 0);
+			Size = a.size;
+			Parent = e
+		})
+		n:AttachTheme(g, {
+			ImageColor3 = "inactive"
+		})
+		local h = Instance_manager.new("TextLabel", {
+			Name = "Window_Name";
+			Text = string.upper(a.name);
+			FontFace = n.font;
+			TextSize = n.font_size;
+			BackgroundTransparency = 1;
+			TextStrokeTransparency = 0;
+			BorderSizePixel = 0;
+			AnchorPoint = Vector2.new(0, 0.5);
+			Position = b(0, 10 + a.size.X.Offset, 0.5, 0);
+			Size = b(1, - (15 + a.size.X.Offset), 0, 20);
+			TextXAlignment = Enum.TextXAlignment.Left;
+			Parent = e
+		})
+		n:AttachTheme(h, {
+			TextColor3 = "inactive"
+		})
+		local f = Instance_manager.new("Frame", {
+			Name = "new_page";
+			BackgroundColor3 = f(255, 255, 255);
+			BackgroundTransparency = 1;
+			BorderColor3 = f(0, 0, 0);
+			BorderSizePixel = 0;
+			Position = b(0, -2, 0, 2);
+			Size = b(1, 4, 1, 0);
+			Visible = false;
+			Parent = a.window.elements.holder
+		})
+		local i, j, l;
+		if a.scrollable then
+			i = Instance_manager.new("ScrollingFrame", {
+				Name = "left";
+				Size = UDim2.new(0.33, -10, 1, 0);
+				ScrollBarThickness = 1;
+				BorderSizePixel = 1;
+				AutomaticCanvasSize = Enum.AutomaticSize.Y;
+				Parent = f
+			})
+			j = Instance_manager.new("ScrollingFrame", {
+				Name = "center";
+				Position = b(0.333, 3, 0, 0);
+				Size = b(0.333, -12, 1, 0);
+				ScrollBarThickness = 1;
+				BorderSizePixel = 1;
+				AutomaticCanvasSize = Enum.AutomaticSize.Y;
+				Parent = f
+			})
+			l = Instance_manager.new("ScrollingFrame", {
+				Name = "right";
+				Position = b(0.666, 6, 0, 0);
+				Size = b(0.333, -4, 1, 0);
+				ScrollBarThickness = 1;
+				BorderSizePixel = 1;
+				AutomaticCanvasSize = Enum.AutomaticSize.Y;
+				Parent = f
+			})
+			n:AttachTheme(i, {
+				ScrollBarImageColor3 = "inactive"
+			})
+			n:AttachTheme(j, {
+				ScrollBarImageColor3 = "inactive"
+			})
+			n:AttachTheme(l, {
+				ScrollBarImageColor3 = "inactive"
+			})
+		else
+			i = Instance_manager.new("Frame", {
+				Name = "left";
+				Size = UDim2.new(0.33, -10, 1, 0);
+				BorderSizePixel = 1;
+				Parent = f
+			})
+			j = Instance_manager.new("Frame", {
+				Name = "center";
+				Position = b(0.333, 3, 0, 0);
+				Size = b(0.333, -12, 1, 0);
+				BorderSizePixel = 1;
+				Parent = f
+			})
+			l = Instance_manager.new("Frame", {
+				Name = "right";
+				Position = b(0.666, 6, 0, 0);
+				Size = b(0.333, -4, 1, 0);
+				BorderSizePixel = 1;
+				Parent = f
+			})
+		end;
+		Instance_manager.new("UIListLayout", {
+			Name = "UIListLayout";
+			Padding = d(0, 6);
+			SortOrder = Enum.SortOrder.LayoutOrder;
+			Parent = i
+		})
+		Instance_manager.new("UIListLayout", {
+			Name = "UIListLayout";
+			Padding = d(0, 6);
+			SortOrder = Enum.SortOrder.LayoutOrder;
+			Parent = j
+		})
+		Instance_manager.new("UIListLayout", {
+			Name = "UIListLayout";
+			Padding = d(0, 6);
+			SortOrder = Enum.SortOrder.LayoutOrder;
+			Parent = l
+		})
+		n:AttachTheme(i, {
+			BackgroundColor3 = "background"
+		})
+		n:AttachTheme(i, {
+			BorderColor3 = "outline"
+		})
+		n:AttachTheme(j, {
+			BackgroundColor3 = "background"
+		})
+		n:AttachTheme(j, {
+			BorderColor3 = "outline"
+		})
+		n:AttachTheme(l, {
+			BackgroundColor3 = "background"
+		})
+		n:AttachTheme(l, {
+			BorderColor3 = "outline"
+		})
+		do
+			local tabHolder = a.window.elements.tab_holder
+			if not tabHolder:GetAttribute("recalc_connected") then
+				tabHolder:SetAttribute("recalc_connected", true)
+				local pending = false
+
+				local function doRecalc()
+					local tabs = {}
+					for _, child in ipairs(tabHolder:GetChildren()) do
+						if child:IsA("TextButton") then
+							table.insert(tabs, child)
+						end
+					end
+					local count = #tabs
+					if count == 0 then return end
+
+					local holderW = tabHolder.AbsoluteSize.X
+					if holderW == 0 then return end
+
+					-- gap между табами = 4, нет внешних паддингов
+					local gap   = 2
+					local total = holderW - gap * (count - 1)
+					local base  = math.floor(total / count)
+					-- остаток пикселей раздаём первым табам (по 1px)
+					local extra = total - base * count
+
+					for i, tab in ipairs(tabs) do
+						-- Вместо растягивания на всю ширину, оставляем размер по содержимому + маленькие отступы
+						tab.Size = UDim2.new(0, tab.AbsoluteSize.X + 10, 1, 0)
+					end
+				end
+
+				tabHolder.ChildAdded:Connect(function()
+					if pending then return end
+					pending = true
+					task.defer(function()
+						pending = false
+						doRecalc()
+						-- страховка: если AbsoluteSize был 0, повторяем через кадр
+						if tabHolder.AbsoluteSize.X == 0 then
+							task.defer(doRecalc)
+						end
+					end)
+				end)
+			end
+		end;
+		function a:Turn(d)
+			a.open = d
+			f.Visible = d
+			-- Обновляем только иконку и текст таба — без перебора всех descendants
+			n:AttachTheme(g, { ImageColor3 = d and "accent" or "inactive" })
+			n:AttachTheme(h, { TextColor3  = d and "accent" or "inactive" })
+		end;
+		signals.connection(e.MouseButton1Down, function()
+			if not a.open then
+				for b, b in pairs(a.window.pages) do
+					if b.open and b ~= a then
+						b:Turn(false)
+					end
+				end;
+				a:Turn(true)
+			end
+		end)
+		a.elements = {
+			left = i,
+			center = j,
+			right = l,
+			button = e,
+			main = f
+		}
+		if # a.window.pages == 0 then
+			a:Turn(true)
+		end;
+		a.window.pages[# a.window.pages + 1] = a;
+		n.pages[# n.pages + 1] = a;
+		a.window:update_tabs()
+		return setmetatable(a, n.pages)
+	end;
+	function a:section(a)
+		if not a then
+			a = {}
+		end;
+		local a = {
+			name = (a.name or a.Name or "section"),
+			page = self,
+			side = (a.side or a.Side),
+			risky = (a.risky or a.Risky),
+			elements = {},
+			content = {},
+			sections = {}
+		}
+		local e = Instance_manager.new("Frame", {
+			Name = "top_section";
+			BackgroundTransparency = 1;
+			AutomaticSize = Enum.AutomaticSize.Y;
+			BorderColor3 = f(0, 0, 0);
+			Size = b(1, 0, 0, 20);
+			Parent = (a.side == "left" and a.page.elements.left) or (a.side == "center" and a.page.elements.center) or (a.side == "right" and a.page.elements.right);
+			ZIndex = 10 - # a.page.sections
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		local g = Instance_manager.new("TextLabel", {
+			Name = a.name;
+			FontFace = n.font;
+			Text = string.upper(a.name);
+			TextSize = n.font_size;
+			TextStrokeTransparency = 0;
+			TextXAlignment = Enum.TextXAlignment.Left;
+			BackgroundTransparency = 1;
+			BorderColor3 = f(0, 0, 0);
+			BorderSizePixel = 0;
+			Position = b(0, 15, 0, 12);
+			Size = b(0, 186, 0, 20);
+			Parent = e
+		})
+		n:AttachTheme(g, {
+			TextColor3 = a.risky and "risky" or "inactive"
+		})
+		local b = Instance_manager.new("Frame", {
+			Name = "section_content";
+			AutomaticSize = Enum.AutomaticSize.Y;
+			BackgroundColor3 = f(255, 255, 255);
+			BackgroundTransparency = 1;
+			BorderColor3 = f(0, 0, 0);
+			BorderSizePixel = 0;
+			Position = b(0, 16, 0, 44);
+			Size = b(1, -32, 0, 30);
+			Parent = e
+		})
+		Instance_manager.new("UIListLayout", {
+			Name = "UIListLayout";
+			Padding = d(0, 22);
+			SortOrder = Enum.SortOrder.LayoutOrder;
+			Parent = b
+		})
+		Instance_manager.new("UIPadding", {
+			Name = "UIPadding";
+			PaddingBottom = d(0, 6);
+			Parent = b
+		})
+		a.elements = {
+			section_content = b
+		}
+		a.page.sections[# a.page.sections + 1] = a;
+		return setmetatable(a, n.sections)
+	end;
+	function g:toggle(a)
+		if not a then
+			a = {}
+		end;
+		local a = {
+			window = self.window,
+			page = self.page,
+			section = self,
+			risk = a.Risk or a.Risky or a.risk or a.risky or false,
+			name = a.Name or a.name or "Toggle",
+			description = a.Description or a.description or "Unknown",
+			State = (a.state or a.State or a.def or a.Def or a.default or a.Default or false),
+			callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end),
+			flag = (a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag()),
+			toggled = false,
+			Colorpickers = 0
+		}
+		local e = Instance_manager.new("TextButton", {
+			Name = a.name;
+			Text = "";
+			AutoButtonColor = false;
+			BackgroundTransparency = 1;
+			Size = b(1, 0, 0, 18);
+			Parent = a.section.elements.section_content
+		})
+		local g = Instance_manager.new("Frame", {
+			Name = "toggle_bg";
+			Position = b(0.82, 0, 0.5, -7);
+			Size = b(0, 28, 0, 14);
+			AnchorPoint = Vector2.new(0, 0.5);
+			Parent = e
+		})
+		n:AttachTheme(g, {
+			BackgroundColor3 = "outline"
+		})
+		Instance_manager.new("UICorner", {
+			Parent = g;
+			CornerRadius = d(0, 7)
+		})
+		local h = Instance_manager.new("Frame", {
+			Name = "accent_bg";
+			BorderSizePixel = 0;
+			Position = b(0, 2, 0.5, -5);
+			Size = b(0, 10, 0, 10);
+			Parent = g
+		})
+		n:AttachTheme(h, {
+			BackgroundColor3 = "inactive"
+		})
+		Instance_manager.new("UICorner", {
+			Parent = h;
+			CornerRadius = d(1, 0)
+		})
+		local d = Instance_manager.new("TextLabel", {
+			Name = "title";
+			FontFace = n.font;
+			TextSize = n.font_size;
+			TextStrokeTransparency = 0;
+			TextXAlignment = Enum.TextXAlignment.Left;
+			BackgroundColor3 = f(255, 255, 255);
+			BackgroundTransparency = 1;
+			BorderColor3 = f(0, 0, 0);
+			BorderSizePixel = 0;
+			Position = b(0, 0, 0, 0);
+			Size = b(1, 0, 1, 0);
+			TextColor3 = a.risk and f(200, 0, 0) or f(255, 255, 255);
+			Parent = e;
+			Text = a.name
+		})
+		local b = Instance_manager.new("TextLabel", {
+			Name = "description";
+			FontFace = n.font;
+			TextSize = n.font_size;
+			TextStrokeTransparency = 0;
+			TextXAlignment = Enum.TextXAlignment.Left;
+			BackgroundColor3 = f(255, 255, 255);
+			BackgroundTransparency = 1;
+			BorderColor3 = f(0, 0, 0);
+			BorderSizePixel = 0;
+			Position = b(0, 0, 0, 15);
+			Size = b(1, 0, 1, 0);
+			Parent = e;
+			Text = a.description
+		})
+		n:AttachTheme(b, {
+			TextColor3 = "inactive"
+		})
+		local function b()
+			a.toggled = not a.toggled
+			n.flags[a.flag] = a.toggled
+			a.callback(a.toggled)
+			local theme = n.themes[n.currentTheme or "Blue"]
+			k:Create(g, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+				BackgroundColor3 = a.toggled and theme.accent or theme.outline
+			}):Play()
+			k:Create(h, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+				Position = a.toggled and UDim2.new(1, -12, 0.5, -5) or UDim2.new(0, 2, 0.5, -5)
+			}):Play()
+		end;
+		signals.connection(e.MouseButton1Down, b)
+		function a.Set(d)
+			d = type(d) == "boolean" and d or false;
+			if a.toggled ~= d then
+				b()
+			end
+		end;
+		a.Set(a.State)
+		n.flags[a.flag] = a.State;
+		p[a.flag] = a.Set;
+		return a
+	end;
+	function g:slider(a)
+		if not a then
+			a = {}
+		end;
+		local a = {
+			window = self.Window,
+			page = self.Page,
+			section = self,
+			Name = (a.name or a.Name or nil),
+			Min = (a.min or a.Min or a.minimum or a.Minimum or 0),
+			State = (a.state or a.State or a.def or a.Def or a.default or a.Default or 10),
+			Max = (a.max or a.Max or a.maximum or a.Maximum or 100),
+			Sub = (a.suffix or a.Suffix or a.ending or a.Ending or a.prefix or a.Prefix or a.measurement or a.Measurement or ""),
+			Decimals = (a.decimals or a.Decimals or 1),
+			Callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end),
+			Flag = (a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag()),
+			Disabled = (a.Disabled or a.disable or nil)
+		}
+		local g = ("[value]" .. a.Sub)
+		local h = Instance_manager.new("Frame", {
+			Name = "new_slider",
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, a.Name and 26 or 12),
+			Parent = a.section.elements.section_content
+		})
+		local i = Instance_manager.new("TextButton", {
+			Name = "Slider_Inline",
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 0, 1, -2),
+			Size = b(1, 0, 0, 5),
+			FontFace = n.font,
+			Text = "",
+			TextColor3 = f(0, 0, 0),
+			TextSize = n.font_size,
+			AutoButtonColor = false,
+			Parent = h
+		})
+		n:AttachTheme(i, {
+			BackgroundColor3 = "outline"
+		})
+		local l = Instance_manager.new("TextButton", {
+			Name = "Slider_Accent",
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(0, 0, 1, 0),
+			FontFace = n.font,
+			Text = "",
+			TextColor3 = f(0, 0, 0),
+			TextSize = n.font_size,
+			AutoButtonColor = false,
+			Parent = i
+		})
+		n:AttachTheme(l, {
+			BackgroundColor3 = "accent"
+		})
+		local e = Instance_manager.new("Frame", {
+			Name = "Slider_Circle",
+			Size = b(0, 12, 0, 12),
+			AnchorPoint = e(0.5, 0.5),
+			Parent = i
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "accent"
+		})
+		Instance_manager.new("UICorner", {
+			Parent = e,
+			CornerRadius = d(1, 0)
+		})
+		local d = Instance_manager.new("TextLabel", {
+			Name = "Value",
+			FontFace = n.font,
+			Text = "0",
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, 10),
+			Position = b(0, 0, 0, 4),
+			TextXAlignment = Enum.TextXAlignment.Right,
+			Parent = h
+		})
+		local f = Instance_manager.new("TextLabel", {
+			Name = "Title",
+			FontFace = n.font,
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, 10),
+			Position = b(0, 0, 0, 4),
+			Text = a.Name or "",
+			Visible = a.Name ~= nil,
+			Parent = h
+		})
+		local f = false;
+		local h = a.State;
+		local m;
+		local function o(f)
+			f = math.clamp(math.floor(f * a.Decimals + 0.5) / a.Decimals, a.Min, a.Max)
+			local j = b((f - a.Min) / (a.Max - a.Min), 0, 1, 0)
+			if m then
+				m:Cancel()
+			end;
+			m = k:Create(l, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+				Size = j
+			})
+			m:Play()
+			local i = i.AbsoluteSize.X;
+			local i = i * j.X.Scale;
+			local j = 5;
+			local l = 5;
+			local b = b(0, i - e.AbsoluteSize.X / 2 + j, 1, - e.AbsoluteSize.Y / 2 + l)
+			local b = k:Create(e, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+				Position = b
+			})
+			b:Play()
+			d.Text = a.Disabled and f == a.Min and a.Disabled or g:gsub("%[value%]", string.format("%.14g", f))
+			h = f;
+			n.flags[a.Flag] = f;
+			a.Callback(f)
+		end;
+		local function b(b)
+			o(((a.Max - a.Min) * ((b.Position.X - i.AbsolutePosition.X) / i.AbsoluteSize.X)) + a.Min)
+		end;
+		for a, a in pairs({
+			i,
+			l
+		}) do
+			signals.connection(a.InputBegan, function(a)
+				if a.UserInputType == Enum.UserInputType.MouseButton1 then
+					f = true;
+					b(a)
+				end
+			end)
+			signals.connection(a.InputEnded, function(a)
+				if a.UserInputType == Enum.UserInputType.MouseButton1 then
+					f = false
+				end
+			end)
+		end;
+		signals.connection(j.InputChanged, function(a)
+			if a.UserInputType == Enum.UserInputType.MouseMovement and f then
+				b(a)
+			end
+		end)
+		function a:Set(a)
+			o(a)
+		end;
+		p[a.Flag] = o;
+		n.flags[a.Flag] = a.State;
+		o(a.State)
+		return a
+	end;
+	function g:button(a)
+		local a = a or {}
+		local a = {
+			window = self.Window,
+			page = self.Page,
+			section = self,
+			name = (a.name or a.Name or "button"),
+			callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end)
+		}
+		local d = Instance_manager.new("Frame", {
+			Name = "new_button",
+			BackgroundTransparency = 1,
+			Size = b(1, 0, 0, 16),
+			Parent = a.section.elements.section_content
+		})
+		local e = Instance_manager.new("Frame", {
+			Name = "button_outline",
+			Position = b(0, 0, 1, -16),
+			Size = b(1, 0, 0, 22),
+			BorderSizePixel = 0,
+			Parent = d
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "outline"
+		})
+		local g = Instance_manager.new("TextButton", {
+			Name = "button_inline",
+			Text = "",
+			Position = b(0, 1, 0, 1),
+			Size = b(1, -2, 1, -2),
+			FontFace = n.font,
+			BorderSizePixel = 0,
+			TextSize = 11,
+			AutoButtonColor = false,
+			Parent = e
+		})
+		n:AttachTheme(g, {
+			BackgroundColor3 = "outline"
+		})
+		local b = Instance_manager.new("TextLabel", {
+			Name = "button_text",
+			FontFace = n.font,
+			Text = string.upper(a.name),
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			BackgroundTransparency = 1,
+			Size = b(1, 0, 1, 0),
+			Parent = g
+		})
+		do
+			local theme = n.themes[n.currentTheme or "Blue"]
+			d.MouseEnter:Connect(function()
+				k:Create(g, TweenInfo.new(0.25, Enum.EasingStyle.Quad), { BackgroundColor3 = theme.accent }):Play()
+			end)
+			d.MouseLeave:Connect(function()
+				k:Create(g, TweenInfo.new(0.25, Enum.EasingStyle.Quad), { BackgroundColor3 = theme.outline }):Play()
+			end)
+		end
+		signals.connection(g.MouseButton1Down, function()
+			a.callback()
+			b.Text = string.upper(a.name)
+		end)
+		return a
+	end;
+	function g:dropdown(a)
+		local a = a or {}
+		local a = {
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Open = false,
+			description = (a.description or a.Description),
+			Name = a.Name or a.name or nil,
+			Options = (a.options or a.Options or a.values or a.Values or {
+				"1",
+				"2",
+				"3"
+			}),
+			Max = (a.Max or a.max or nil),
+			ScrollMax = (a.ScrollingMax or a.scrollingmax or nil),
+			State = (a.state or a.State or a.def or a.Def or a.default or a.Default or nil),
+			Callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end),
+			Flag = (a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag()),
+			OptionInsts = {}
+		}
+		local g = Instance_manager.new("Frame", {
+			Name = "NewList",
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, a.Name ~= nil and 47 or 42),
+			Parent = a.Section.elements.section_content
+		})
+		local h = Instance_manager.new("Frame", {
+			Name = "List_Outline",
+			BorderSizePixel = 0,
+			BorderColor3 = f(0, 0, 0),
+			Position = b(0, -1, 0, 30),
+			Size = b(1, 0, 0.5, 0),
+			Parent = g
+		})
+		n:AttachTheme(h, {
+			BackgroundColor3 = "outline"
+		})
+		local i = Instance_manager.new("TextButton", {
+			Name = "List_Inline",
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 1, 0, 1),
+			Size = b(1, -2, 1, -2),
+			FontFace = n.font,
+			Text = "",
+			TextColor3 = f(0, 0, 0),
+			TextSize = n.font_size,
+			AutoButtonColor = false,
+			Parent = h
+		})
+		n:AttachTheme(i, {
+			BackgroundColor3 = "outline"
+		})
+		local l = Instance_manager.new("TextLabel", {
+			Name = "Value",
+			FontFace = n.font,
+			Text = "None",
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 5, 0, 0),
+			Size = b(0.75, 0, 1, 0),
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			Parent = i
+		})
+		local e = Instance_manager.new("ImageLabel", {
+			Name = "Dropdown_Icon",
+			Image = "http://www.roblox.com/asset/?id=13184099706",
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = b(0, 8, 0, 10),
+			Position = b(1, -5, 0.5, 0),
+			AnchorPoint = e(1, 0.5),
+			ScaleType = Enum.ScaleType.Fit,
+			Parent = i
+		})
+		n:AttachTheme(e, {
+			ImageColor3 = "inactive"
+		})
+		local h = Instance_manager.new("Frame", {
+			Name = "List_ContentOutline",
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BorderSizePixel = 0,
+			Position = b(0, 1, 1, 2),
+			Size = b(1, -2, 0, 0),
+			Visible = false,
+			Parent = h
+		})
+		n:AttachTheme(h, {
+			BackgroundColor3 = "outline"
+		})
+		local m = Instance_manager.new("Frame", {
+			Name = "List_ContentInline",
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 2, 0, 1),
+			Size = b(1, -3, 1, 0),
+			Parent = h
+		})
+		n:AttachTheme(m, {
+			BackgroundColor3 = "background"
+		})
+		local o = Instance_manager.new("UIListLayout", {
+			Name = "UIListLayout",
+			Padding = d(0, 2),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Parent = m
+		})
+		local d = Instance_manager.new("UIPadding", {
+			Name = "UIPadding",
+			PaddingBottom = d(0, 2),
+			PaddingTop = d(0, 2),
+			Parent = m
+		})
+		local d = Instance_manager.new("TextLabel", {
+			Name = "description",
+			FontFace = n.font,
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, 10),
+			Parent = g,
+			Position = b(0, 0, 0, 15),
+			Visible = a.Name ~= nil and true or false,
+			Text = a.description ~= nil and a.description or "",
+			ZIndex = -1
+		})
+		n:AttachTheme(d, {
+			TextColor3 = "inactive"
+		})
+		local d = Instance_manager.new("TextLabel", {
+			Name = "title",
+			FontFace = n.font,
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, 10),
+			Parent = g,
+			Visible = a.Name ~= nil and true or false,
+			Text = a.Name ~= nil and a.Name or ""
+		})
+		signals.connection(i.MouseButton1Down, function()
+			h.Visible = not h.Visible;
+			k:Create(e, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Rotation = h.Visible and 180 or 0
+			}):Play()
+			g.ZIndex = h.Visible and 5 or 1
+		end)
+		signals.connection(j.InputBegan, function(a)
+			if h.Visible and a.UserInputType == Enum.UserInputType.MouseButton1 then
+				if not n:IsMouseOverFrame(h) and not n:IsMouseOverFrame(i) then
+					h.Visible = false;
+					g.ZIndex = 1;
+					k:Create(e, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Rotation = 0
+					}):Play()
+				end
+			end
+		end)
+		local d = a.Max and {} or nil;
+		local i = 0;
+		local j;
+		local o;
+		local function q(b, f, i, m)
+			f.MouseButton1Down:Connect(function()
+				if a.Max then
+					if table.find(d, b) then
+						table.remove(d, table.find(d, b))
+						n:AttachTheme(i, {
+							TextColor3 = "inactive"
+						})
+						m.BackgroundTransparency = 1
+					else
+						if # d == a.Max then
+							local b = table.remove(d, 1)
+							n:AttachTheme(a.OptionInsts[b].text, {
+								TextColor3 = "inactive"
+							})
+							a.OptionInsts[b].accent.BackgroundTransparency = 1
+						end;
+						table.insert(d, b)
+						n:AttachTheme(i, {
+							TextColor3 = "accent"
+						})
+						m.BackgroundTransparency = 0
+					end;
+					local b = {}
+					for a, a in next, d do
+						table.insert(b, a)
+					end;
+					l.Text = # d == 0 and "" or table.concat(b, ",")
+					n.flags[a.Flag] = d;
+					a.Callback(d)
+				else
+					if j then
+						j.BackgroundTransparency = 1
+					end;
+					if o then
+						n:AttachTheme(o, {
+							TextColor3 = "inactive"
+						})
+					end;
+					for a, a in next, a.OptionInsts do
+						n:AttachTheme(a.text, {
+							TextColor3 = "inactive"
+						})
+						a.accent.BackgroundTransparency = 1
+					end;
+					d = b;
+					l.Text = b;
+					n:AttachTheme(i, {
+						TextColor3 = "accent"
+					})
+					m.BackgroundTransparency = 0;
+					j = m;
+					o = i;
+					h.Visible = false;
+					g.ZIndex = 1;
+					k:Create(e, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Rotation = 0
+					}):Play()
+					n.flags[a.Flag] = b;
+					a.Callback(b)
+				end
+			end)
+		end;
+		local function e(d)
+			for d, d in next, d do
+				a.OptionInsts[d] = {}
+				local e = Instance_manager.new("TextButton", {
+					Name = "NewOption",
+					FontFace = n.font,
+					Text = "",
+					TextColor3 = f(255, 255, 255),
+					TextSize = n.font_size,
+					TextStrokeTransparency = 0,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					AutoButtonColor = false,
+					BackgroundTransparency = 1,
+					Size = b(1, 0, 0, 14),
+					Parent = m
+				})
+				local g = Instance_manager.new("Frame", {
+					Name = "AccentLine",
+					Size = b(0, 1, 1, 0),
+					BackgroundTransparency = 1,
+					Parent = e
+				})
+				n:AttachTheme(g, {
+					BackgroundColor3 = "accent"
+				})
+				local b = Instance_manager.new("TextLabel", {
+					Name = "OptionLabel",
+					FontFace = n.font,
+					Text = d,
+					TextColor3 = f(145, 145, 145),
+					TextSize = n.font_size,
+					TextStrokeTransparency = 0,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					BackgroundTransparency = 1,
+					Position = b(0, 4, 0, 0),
+					Size = b(1, 0, 1, 0),
+					Parent = e
+				})
+				i = i + 1;
+				a.OptionInsts[d].text = b;
+				a.OptionInsts[d].accent = g;
+				q(d, e, b, g)
+			end
+		end;
+		e(a.Options)
+		local b;
+		b = function(b)
+			if a.Max then
+				table.clear(d)
+				b = type(b) == "table" and b or {}
+				for a, d in next, a.OptionInsts do
+					if not table.find(b, a) then
+						n:AttachTheme(d.text, {
+							TextColor3 = "inactive"
+						})
+						d.accent.BackgroundTransparency = 1
+					end
+				end;
+				for b, b in next, b do
+					if table.find(a.Options, b) and # d < a.Max then
+						table.insert(d, b)
+						n:AttachTheme(a.OptionInsts[b].text, {
+							TextColor3 = "accent"
+						})
+						a.OptionInsts[b].accent.BackgroundTransparency = 0
+					end
+				end;
+				local b = {}
+				local e = false;
+				for a, a in next, d do
+					table.insert(b, a)
+				end;
+				l.Text = # d == 0 and "" or table.concat(b, ",") .. (e and ", ..." or "")
+				n.flags[a.Flag] = d;
+				a.Callback(d)
+			end
+		end;
+		function a:Set(e)
+			if a.Max then
+				b(e)
+			else
+				for a, b in next, a.OptionInsts do
+					if a ~= e then
+						n:AttachTheme(b.text, {
+							TextColor3 = "inactive"
+						})
+						b.accent.BackgroundTransparency = 1
+					end
+				end;
+				if table.find(a.Options, e) then
+					d = e;
+					n:AttachTheme(a.OptionInsts[e].text, {
+						TextColor3 = "accent"
+					})
+					a.OptionInsts[e].accent.BackgroundTransparency = 0;
+					l.Text = e;
+					n.flags[a.Flag] = d;
+					a.Callback(d)
+				else
+					d = nil;
+					l.Text = "None"
+					n.flags[a.Flag] = d;
+					a.Callback(d)
+				end
+			end
+		end;
+		function a:Refresh(b)
+			for _, inst in next, a.OptionInsts do
+				if inst.button and inst.button.Parent then
+					inst.button:Destroy()
+				end
+			end;
+			table.clear(a.OptionInsts)
+			e(b)
+			if a.Max then
+				table.clear(d)
+			else
+				d = nil
+			end;
+			n.flags[a.Flag] = d;
+			a.Callback(d)
+		end;
+		function a:Delete(b)
+			for d, d in next, a.OptionInsts do
+				if (d.button.Text == b) then
+					a.OptionInsts[d] = nil;
+					d.button:Destroy()
+				end
+			end
+		end;
+		if a.Max then
+			p[a.Flag] = b
+		else
+			p[a.Flag] = a
+		end;
+		a:Set(a.State)
+		return a
+	end;
+	function g:textbox(a)
+		local a = a or {}
+		local a = {
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Name = (a.Name or a.name or nil),
+			Placeholder = (a.placeholder or a.Placeholder or a.holder or a.Holder or ""),
+			State = (a.state or a.State or a.def or a.Def or a.default or a.Default or ""),
+			Callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end),
+			Flag = (a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag())
+		}
+		local d = Instance_manager.new("TextButton", {
+			Name = "NewBox",
+			FontFace = n.font,
+			Text = "",
+			TextColor3 = f(0, 0, 0),
+			TextSize = n.font_size,
+			AutoButtonColor = false,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, a.Name ~= nil and 30 or 20),
+			Parent = a.Section.elements.section_content
+		})
+		local e = Instance_manager.new("Frame", {
+			Name = "textbox_outline",
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 0, 1, -16),
+			Size = b(1, 0, 0, 20),
+			Parent = d
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "outline"
+		})
+		local e = Instance_manager.new("Frame", {
+			Name = "textbox_inline",
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 1, 0, 1),
+			Size = b(1, -2, 1, -2),
+			Parent = e
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		local e = Instance_manager.new("TextBox", {
+			Name = "text",
+			FontFace = n.font,
+			Text = a.State,
+			PlaceholderText = a.Placeholder,
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 4, 0, 0),
+			Size = b(1, 0, 1, 0),
+			Parent = e,
+			ClearTextOnFocus = false
+		})
+		n:AttachTheme(e, {
+			PlaceholderColor3 = "inactive"
+		})
+		local b = Instance_manager.new("TextLabel", {
+			Name = "title",
+			FontFace = n.font,
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundColor3 = f(255, 255, 255),
+			BackgroundTransparency = 1,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, 10),
+			Parent = d,
+			Position = b(0, 2, 0, 0),
+			Text = a.Name ~= nil and a.Name or "",
+			Visible = a.Name ~= nil and true or false
+		})
+		e.FocusLost:Connect(function()
+			a.Callback(e.Text)
+			n.flags[a.Flag] = e.Text
+		end)
+		local function b(b)
+			e.Text = b;
+			n.flags[a.Flag] = b;
+			a.Callback(b)
+		end;
+		p[a.Flag] = b;
+		return a
+	end;
+	function g:listbox(a)
+		local a = {
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Open = a.open or false,
+			Options = a.options or a.Options or a.values or a.Values or {
+				"1",
+				"2",
+				"3"
+			},
+			Max = a.Max or a.max or nil,
+			ScrollMax = a.ScrollingMax or a.scrollingmax or nil,
+			State = a.state or a.State or a.def or a.Def or a.default or a.Default or nil,
+			Callback = a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end,
+			Flag = a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag(),
+			OptionInsts = {}
+		}
+		local e = Instance_manager.new("TextButton", {
+			Name = "NewList",
+			FontFace = n.font,
+			Text = "",
+			TextColor3 = f(0, 0, 0),
+			TextSize = n.font_size,
+			AutoButtonColor = false,
+			BackgroundTransparency = 0,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Size = b(1, 0, 0, (14 * (a.ScrollMax or # a.Options)) + (2 * (a.ScrollMax or # a.Options)) + 4),
+			Parent = a.Section.elements.section_content
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "outline"
+		})
+		local e = Instance_manager.new("Frame", {
+			Name = "ContentOutline",
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BorderColor3 = f(0, 0, 0),
+			Size = b(1, 0, 1, 0),
+			Parent = e
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "outline"
+		})
+		Instance_manager.new("UICorner", {
+			Parent = e,
+			CornerRadius = d(0, 3)
+		})
+		local e = Instance_manager.new("ScrollingFrame", {
+			Name = "ContentInline",
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			BottomImage = "rbxassetid://7783554086",
+			CanvasSize = b(),
+			MidImage = "rbxassetid://7783554086",
+			ScrollBarThickness = 2,
+			Active = true,
+			BorderColor3 = f(0, 0, 0),
+			BorderSizePixel = 0,
+			Position = b(0, 1, 0, 1),
+			Size = b(1, -2, 1, -2),
+			Parent = e
+		})
+		n:AttachTheme(e, {
+			ScrollBarImageColor3 = "accent"
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		Instance_manager.new("UICorner", {
+			Parent = e,
+			CornerRadius = d(0, 3)
+		})
+		Instance_manager.new("UIListLayout", {
+			Name = "UIListLayout",
+			Padding = d(0, 2),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Parent = e
+		})
+		Instance_manager.new("UIPadding", {
+			Name = "UIPadding",
+			PaddingBottom = d(0, 2),
+			PaddingTop = d(0, 2),
+			Parent = e
+		})
+		local function d(b, d, e)
+			d.MouseButton1Down:Connect(function()
+				local theme = n.themes[n.currentTheme or "Blue"]
+				for _, inst in pairs(a.OptionInsts) do
+					inst.label.TextColor3 = theme.inactive
+				end
+				e.TextColor3 = theme.accent
+				n.flags[a.Flag] = b
+				a.Callback(b)
+			end)
+		end;
+		for f, f in ipairs(a.Options) do
+			local g = Instance_manager.new("TextButton", {
+				Name = "Option",
+				Text = "",
+				Size = b(1, 0, 0, 14),
+				BackgroundTransparency = 1,
+				Parent = e
+			})
+			n:AttachTheme(e, {
+				ScrollBarImageColor3 = "accent"
+			})
+			local b = Instance_manager.new("TextLabel", {
+				Text = f,
+				BackgroundTransparency = 1,
+				Size = b(1, 0, 1, 0),
+				FontFace = n.font,
+				TextSize = n.font_size,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Position = b(0, 5, 0, 0),
+				Parent = g
+			})
+			n:AttachTheme(b, {
+				TextColor3 = "inactive"
+			})
+			a.OptionInsts[f] = {
+				label = b
+			}
+			d(f, g, b)
+		end;
+		function a:Set(b)
+			n.flags[a.Flag] = b;
+			a.Callback(b)
+		end;
+		function a:Refresh(f)
+			for a, a in pairs(a.OptionInsts) do
+				a.label.Parent:Destroy()
+			end;
+			a.OptionInsts = {}
+			for f, f in ipairs(f) do
+				local g = Instance_manager.new("TextButton", {
+					Name = "Option",
+					Text = "",
+					Size = b(1, 0, 0, 14),
+					BackgroundTransparency = 1,
+					Parent = e
+				})
+				n:AttachTheme(e, {
+					ScrollBarImageColor3 = "accent"
+				})
+				local b = Instance_manager.new("TextLabel", {
+					Text = f,
+					BackgroundTransparency = 1,
+					Size = b(1, 0, 1, 0),
+					FontFace = n.font,
+					TextSize = n.font_size,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Position = b(0, 5, 0, 0),
+					Parent = g
+				})
+				n:AttachTheme(b, {
+					TextColor3 = "inactive"
+				})
+				a.OptionInsts[f] = {
+					label = b
+				}
+				d(f, g, b)
+			end;
+			a:Set(a.State)
+		end;
+		a:Set(a.State)
+		return a
+	end;
+	function g:colorpicker(a)
+		local a = a or {}
+		local a = {
+			Window = self.Window,
+			Page = self.Page,
+			Section = self,
+			Name = (a.Name or a.name or "Colorpicker"),
+			Description = (a.Description or a.description),
+			State = (a.state or a.State or a.def or a.Def or a.default or a.Default or Color3.fromRGB(255, 0, 0)),
+			Alpha = (a.alpha or a.Alpha or a.transparency or a.Transparency or 1),
+			Callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end),
+			Flag = (a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag()),
+			Colorpickers = 0
+		}
+		local e = Instance.new("TextButton")
+		local f = Instance.new("TextLabel")
+		local g = Instance.new("TextLabel")
+		do
+			e.Name = "NewColor"
+			e.FontFace = n.font;
+			e.Text = ""
+			e.TextColor3 = Color3.fromRGB(0, 0, 0)
+			e.TextSize = n.font_size;
+			e.AutoButtonColor = false;
+			e.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			e.BackgroundTransparency = 1;
+			e.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			e.BorderSizePixel = 0;
+			e.Size = UDim2.new(1, 0, 0, 20)
+			e.Parent = a.Section.elements.section_content;
+			Instance_manager.new("UICorner", {
+				Parent = e;
+				CornerRadius = d(0, 4)
+			})
+			f.Name = "Title"
+			f.FontFace = n.font;
+			f.TextColor3 = Color3.fromRGB(255, 255, 255)
+			f.TextSize = n.font_size;
+			f.TextStrokeTransparency = 0;
+			f.TextXAlignment = Enum.TextXAlignment.Left;
+			f.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			f.BackgroundTransparency = 1;
+			f.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			f.BorderSizePixel = 0;
+			f.Size = UDim2.new(1, 0, 1, 0)
+			f.Parent = e;
+			f.Text = a.Name;
+			g.Name = "Description"
+			g.FontFace = n.font;
+			g.TextSize = n.font_size;
+			g.TextStrokeTransparency = 0;
+			g.TextXAlignment = Enum.TextXAlignment.Left;
+			g.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			g.BackgroundTransparency = 1;
+			g.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			g.BorderSizePixel = 0;
+			g.Size = UDim2.new(1, 0, 1, 0)
+			g.Position = b(0, 0, 0, 15)
+			g.Parent = e;
+			g.Text = a.Description;
+			n:AttachTheme(g, {
+				TextColor3 = "inactive"
+			})
+		end;
+		a.Colorpickers = a.Colorpickers + 1;
+		local b = n:NewPicker(a.Name, a.State, a.Alpha, e, a.Colorpickers, a.Flag, a.Callback)
+		function a:Set(a)
+			b:set(a, false, true)
+		end;
+		function a:colorpicker(b)
+			local b = b or {}
+			local b = {
+				State = (b.state or b.State or b.def or b.Def or b.default or b.Default or Color3.fromRGB(255, 0, 0)),
+				Alpha = (b.alpha or b.Alpha or b.transparency or b.Transparency or 1),
+				Callback = (b.callback or b.Callback or b.callBack or b.CallBack or function()
+				end),
+				Flag = (b.flag or b.Flag or b.pointer or b.Pointer or n.next_flag())
+			}
+			a.Colorpickers = a.Colorpickers + 1;
+			local a = n:NewPicker("", b.State, b.Alpha, e, a.Colorpickers, b.Flag, b.Callback)
+			function b:Set(b)
+				a:Set(b)
+			end;
+			return b
+		end;
+		return a
+	end;
+	function g:keybind(a)
+		local a = a or {}
+		local a = {
+			Section = self,
+			Name = (a.name or a.Name or "Keybind"),
+			description = (a.description or a.Description or ""),
+			State = (a.state or a.State or a.def or a.Def or a.default or a.Default or nil),
+			Mode = (a.mode or a.Mode or "Toggle"),
+			UseKey = (a.UseKey or a.usekey or false),
+			Ignore = (a.ignore or a.Ignore or false),
+			Callback = (a.callback or a.Callback or a.callBack or a.CallBack or function()
+			end),
+			Flag = (a.flag or a.Flag or a.pointer or a.Pointer or n.next_flag()),
+			Binding = nil
+		}
+		local d, g = false;
+		local i;
+		if not a.Ignore then
+			local b = (a.State == nil) and "None" or a.state;
+			local a = (a.Name == nil) and "None" or a.Name;
+			i = n.keybind_list:NewKey(b, a)
+		end;
+		local l = Instance_manager.new("Frame", {
+			Name = "NewBind",
+			BackgroundTransparency = 1,
+			Size = b(1, 20, 0, 14),
+			Parent = a.Section.elements.section_content
+		})
+		local o = Instance_manager.new("TextLabel", {
+			Name = "Title",
+			FontFace = n.font,
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundTransparency = 1,
+			Size = b(1, 0, 1, 0),
+			BorderSizePixel = 0,
+			Parent = l,
+			Text = a.Name
+		})
+		local o = Instance_manager.new("TextLabel", {
+			Name = "description",
+			FontFace = n.font,
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			TextColor3 = f(255, 255, 255),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = b(1, 0, 1, 0),
+			Parent = l,
+			Position = b(0, 0, 0, 15),
+			Text = a.description
+		})
+		n:AttachTheme(o, {
+			TextColor3 = "inactive"
+		})
+		local o = Instance_manager.new("Frame", {
+			Name = "Keybind_Outline",
+			AnchorPoint = e(1, 0),
+			Position = b(0.90, 0, 0, -1),
+			Size = b(0, 80, 1.75, 3),
+			BorderSizePixel = 0,
+			Parent = l
+		})
+		n:AttachTheme(o, {
+			BackgroundColor3 = "outline"
+		})
+		local q = Instance_manager.new("TextButton", {
+			Name = "Keybind_Inline",
+			Position = b(0, 1, 0, 1),
+			Size = b(1, -2, 1, -2),
+			FontFace = n.font,
+			Text = "",
+			TextColor3 = f(255, 255, 255),
+			TextSize = n.font_size,
+			AutoButtonColor = false,
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Parent = o
+		})
+		n:AttachTheme(q, {
+			BackgroundColor3 = "outline"
+		})
+		local r = Instance_manager.new("Frame", {
+			Name = "Container",
+			BackgroundTransparency = 1,
+			AnchorPoint = e(0.5, 0.5),
+			Position = b(0.47, 0, 0.5, 0),
+			Size = b(0, 0, 1, 0),
+			AutomaticSize = Enum.AutomaticSize.X,
+			BorderSizePixel = 0,
+			Parent = q
+		})
+		local s = Instance_manager.new("ImageLabel", {
+			Name = "Bind_Icon",
+			Image = "http://www.roblox.com/asset/?id=16081386298",
+			BackgroundTransparency = 1,
+			AnchorPoint = e(0, 0.5),
+			Position = b(0, 1, 0.5, 0),
+			Size = b(0, 20, 0, 20),
+			Parent = r
+		})
+		n:AttachTheme(s, {
+			ImageColor3 = "inactive"
+		})
+		local r = Instance_manager.new("TextLabel", {
+			Name = "Value",
+			FontFace = n.font,
+			Text = "None",
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0,
+			BackgroundTransparency = 1,
+			AnchorPoint = e(0, 0.5),
+			Position = b(0, 23, 0.5, 0),
+			Size = b(0, 0, 1, 0),
+			AutomaticSize = Enum.AutomaticSize.X,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = r
+		})
+		n:AttachTheme(r, {
+			TextColor3 = "inactive"
+		})
+		q.Size = b(1, -2, 1, -2)
+		q.MouseEnter:Connect(function()
+			local theme = n.themes[n.currentTheme or "Blue"]
+			k:Create(q, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { BackgroundColor3 = theme.accent }):Play()
+			k:Create(r, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { TextColor3 = f(255, 255, 255) }):Play()
+		end)
+		q.MouseLeave:Connect(function()
+			local theme = n.themes[n.currentTheme or "Blue"]
+			k:Create(q, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { BackgroundColor3 = theme.outline }):Play()
+			k:Create(r, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { TextColor3 = f(120, 120, 120) }):Play()
+		end)
+		local e = Instance_manager.new("Frame", {
+			Name = "ModeBox",
+			Parent = o,
+			AnchorPoint = e(0, 0.5),
+			BorderSizePixel = 1,
+			Size = b(0, 65, 0, 60),
+			Position = b(0, -70, 3, 0),
+			Visible = false,
+			ZIndex = 99999
+		})
+		n:AttachTheme(e, {
+			BackgroundColor3 = "background"
+		})
+		n:AttachTheme(e, {
+			BorderColor3 = "outline"
+		})
+		local k = Instance_manager.new("TextButton", {
+			Name = "Hold",
+			Parent = e,
+			BackgroundTransparency = 1,
+			Size = b(1, 0, 0.333, 0),
+			ZIndex = 2,
+			FontFace = n.font,
+			Text = "Hold",
+			TextColor3 = a.Mode == "Hold" and f(255, 255, 255) or f(145, 145, 145),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0
+		})
+		local o = Instance_manager.new("TextButton", {
+			Name = "Toggle",
+			Parent = e,
+			BackgroundTransparency = 1,
+			Position = b(0, 0, 0.333, 0),
+			Size = b(1, 0, 0.333, 0),
+			ZIndex = 2,
+			FontFace = n.font,
+			Text = "Toggle",
+			TextColor3 = a.Mode == "Toggle" and f(255, 255, 255) or f(145, 145, 145),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0
+		})
+		local b = Instance_manager.new("TextButton", {
+			Name = "Always",
+			Parent = e,
+			BackgroundTransparency = 1,
+			Position = b(0, 0, 0.667, 0),
+			Size = b(1, 0, 0.333, 0),
+			ZIndex = 2,
+			FontFace = n.font,
+			Text = "Always",
+			TextColor3 = a.Mode == "Always" and f(255, 255, 255) or f(145, 145, 145),
+			TextSize = n.font_size,
+			TextStrokeTransparency = 0
+		})
+		local function s(b)
+			if string.find(tostring(b), "Enum") then
+				if c then
+					c:Disconnect()
+					if a.Flag then
+						n.flags[a.Flag] = false
+					end;
+					a.Callback(false)
+				end;
+				if tostring(b):find("Enum.KeyCode.") then
+					b = Enum.KeyCode[tostring(b):gsub("Enum.KeyCode.", "")]
+				elseif tostring(b):find("Enum.UserInputType.") then
+					b = Enum.UserInputType[tostring(b):gsub("Enum.UserInputType.", "")]
+				end;
+				if b == Enum.KeyCode.Backspace then
+					g = nil;
+					if a.UseKey then
+						if a.Flag then
+							n.flags[a.Flag] = g
+						end;
+						a.Callback(g)
+					end;
+					local b = "None"
+					r.Text = b;
+					if not a.Ignore then
+						local b = (b == nil) and "None" or b;
+						local a = (a.Name == nil) and "None" or a.Name;
+						i:Update(b, a)
+					end
+				elseif b ~= nil then
+					g = b;
+					if a.UseKey then
+						if a.Flag then
+							n.flags[a.Flag] = g
+						end;
+						a.Callback(g)
+					end;
+					local b = (n.keys[b] or tostring(b):gsub("Enum.KeyCode.", ""))
+					r.Text = b;
+					if not a.Ignore then
+						local b = (b == nil) and "None" or b;
+						local a = (a.Name == nil) and "None" or a.Name;
+						i:Update(b, a)
+					end
+				end;
+				n.flags[a.Flag .. "_KEY"] = b
+			elseif table.find({
+				"Always",
+				"Toggle",
+				"Hold"
+			}, b) then
+				if not a.UseKey then
+					n.flags[a.Flag .. "_KEY STATE"] = b;
+					a.Mode = b;
+					if not a.Ignore then
+						local b = (n.keys[g] == nil) and "None" or (tostring(g):gsub("Enum.KeyCode.", "") or "None")
+						local a = (a.Name == nil) and "None" or a.Name;
+						i:Update(b, a)
+					end;
+					if a.Mode == "Always" then
+						d = true;
+						if a.Flag then
+							n.flags[a.Flag] = d
+						end;
+						a.Callback(true)
+						if i then i:SetActive(true) end
+					end
+				end
+			else
+				d = b;
+				if a.Flag then
+					n.flags[a.Flag] = b
+				end;
+				a.Callback(b)
+			end
+		end;
+		s(a.State)
+		s(a.Mode)
+		q.MouseButton1Click:Connect(function()
+			if a.Binding then return end
+			r.Text = "..."
+			-- Пропускаем первый кадр чтобы MouseButton1 клика не попал в бинд
+			task.defer(function()
+				a.Binding = signals.connection(j.InputBegan, function(input)
+					-- Escape = сбросить бинд в nil
+					if input.KeyCode == Enum.KeyCode.Escape then
+						a.Binding:Disconnect()
+						a.Binding = nil
+						-- сбрасываем через уже существующую функцию s
+						g = nil
+						r.Text = "None"
+						n.flags[a.Flag .. "_KEY"] = nil
+					if not a.Ignore and i then
+						i:Update("None", a.Name or "None")
+						i:SetActive(false)
+					end
+					return
+					end
+					local key = input.UserInputType == Enum.UserInputType.Keyboard
+						and input.KeyCode
+						or input.UserInputType
+					s(key)
+					a.Binding:Disconnect()
+					a.Binding = nil
+				end)
+			end)
+		end)
+		signals.connection(j.InputBegan, function(b)
+			if (b.KeyCode == g or b.UserInputType == g) and not a.Binding and not a.UseKey then
+				if a.Mode == "Hold" then
+					if a.Flag then
+						n.flags[a.Flag] = true
+					end;
+					signals.connection(h.RenderStepped, function()
+						if a.Callback then
+							a.Callback(true)
+						end
+					end)
+					if not a.Ignore then
+						if i then i:SetActive(true) end
+					end
+				elseif a.Mode == "Toggle" then
+					d = not d;
+					if a.Flag then
+						n.flags[a.Flag] = d
+					end;
+					a.Callback(d)
+					if not a.Ignore then
+						if i then i:SetActive(d) end
+					end
+				end
+			end
+		end)
+		signals.connection(j.InputEnded, function(b)
+			if a.Mode == "Hold" and not a.UseKey then
+				if g ~= "" or g ~= nil then
+					if b.KeyCode == g or b.UserInputType == g then
+						if c then
+							c:Disconnect()
+							if a.Flag then
+								n.flags[a.Flag] = false
+							end;
+							if a.Callback then
+								a.Callback(false)
+							end;
+							if not a.Ignore then
+								if i then i:SetActive(false) end
+							end
+						end
+					end
+				end
+			end
+		end)
+		signals.connection(q.MouseButton2Down, function()
+			e.Visible = true;
+			l.ZIndex = 5
+		end)
+		signals.connection(k.MouseButton1Down, function()
+			s("Hold")
+			k.TextColor3 = f(255, 255, 255)
+			o.TextColor3 = f(145, 145, 145)
+			b.TextColor3 = f(145, 145, 145)
+			e.Visible = false;
+			l.ZIndex = 1
+		end)
+		signals.connection(o.MouseButton1Down, function()
+			s("Toggle")
+			k.TextColor3 = f(145, 145, 145)
+			o.TextColor3 = f(255, 255, 255)
+			b.TextColor3 = f(145, 145, 145)
+			e.Visible = false;
+			l.ZIndex = 1
+		end)
+		signals.connection(b.MouseButton1Down, function()
+			s("Always")
+			k.TextColor3 = f(145, 145, 145)
+			o.TextColor3 = f(145, 145, 145)
+			b.TextColor3 = f(255, 255, 255)
+			e.Visible = false;
+			l.ZIndex = 1
+		end)
+		signals.connection(j.InputBegan, function(a)
+			if e.Visible and a.UserInputType == Enum.UserInputType.MouseButton1 then
+				local a, b, d = e.AbsolutePosition, e.AbsoluteSize, m;
+				if not (d.X >= a.X and d.X <= a.X + b.X and d.Y >= a.Y and d.Y <= a.Y + b.Y) then
+					e.Visible = false;
+					l.ZIndex = 1
+				end
+			end
+		end)
+		n.flags[a.Flag .. "_KEY"] = a.State;
+		n.flags[a.Flag .. "_KEY STATE"] = a.Mode;
+		p[a.Flag] = s;
+		p[a.Flag .. "_KEY"] = s;
+		p[a.Flag .. "_KEY STATE"] = s;
+		function a:Set(a)
+			s(a)
+		end;
+		return a
+	end
+end;
+local _guiService = cloneref(game:GetService("GuiService"))
+
+local function setMenuCursor(open)
+	-- освобождаем курсор через GuiService когда меню открыто
+	_guiService.MouseIconEnabled = true
+	if open then
+		-- блокируем игровой захват мыши
+		j.MouseBehavior = Enum.MouseBehavior.Default
+	else
+		-- возвращаем управление игре
+		j.MouseBehavior = Enum.MouseBehavior.Default
+	end
+end
+
+signals.connection(j.InputBegan, function(a)
+	if a.KeyCode == n.ui_key then
+		pcall(function()
+			n.autoload = not n.autoload;
+			n.menu_gui.Enabled = n.autoload;
+			q.Visible = n.autoload;
+			r.Size = n.autoload and 20 or 0;
+			if n.logo_gui then n.logo_gui.Enabled = n.autoload end
+			setMenuCursor(n.autoload)
+		end)
+	end
+end)
+
+-- держим курсор свободным пока меню открыто (игра может перехватывать каждый кадр)
+signals.connection(game:GetService("RunService").RenderStepped, function()
+	if n.autoload then
+		if j.MouseBehavior ~= Enum.MouseBehavior.Default then
+			j.MouseBehavior = Enum.MouseBehavior.Default
+		end
+	end
+end)
+function n:Configs(a)
+	a:textbox({
+		flag = "cfg_name",
+		name = "Config name"
+	})
+	local b = a:listbox({
+		flag = "cfg_list",
+		options = {},
+		scrollingmax = 5
+	})
+	local d = {}
+	local function e()
+		local a = {}
+		for b, b in ipairs(listfiles("CONFIGS")) do
+			a[# a + 1] = b:match("CONFIGS\\(.*)%.cfg")
+		end;
+		if # a ~= # d or table.concat(a) ~= table.concat(d) then
+			d = a;
+			b:Refresh(d)
+		end
+	end;
+	a:button({
+		Name = "create",
+		Callback = function()
+			pcall(function()
+				local a = n.flags["cfg_name"]
+				if a ~= "" and not isfile("CONFIGS/" .. a .. ".cfg") then
+					writefile("CONFIGS/" .. a .. ".cfg", n:GetConfig())
+					n:Notification("Created config [" .. a .. "].", 5, Color3.new(0, 1, 1))
+					e()
+				end
+			end)
+		end
+	})
+	a:button({
+		Name = "save",
+		Callback = function()
+			pcall(function()
+				local a = n.flags["cfg_list"]
+				if a then
+					writefile("CONFIGS/" .. a .. ".cfg", n:GetConfig())
+					n:Notification("Saved config [" .. a .. "].", 5, Color3.new(1, 1, 0))
+					e()
+				end
+			end)
+		end
+	})
+	a:button({
+		Name = "load",
+		Callback = function()
+			pcall(function()
+				local a = n.flags["cfg_list"]
+				if a then
+					n:LoadConfig(readfile("CONFIGS/" .. a .. ".cfg"))
+					n:Notification("Loaded config [" .. a .. "].", 5, Color3.new(0, 1, 0))
+					e()
+				end
+			end)
+		end
+	})
+	a:button({
+		Name = "delete",
+		Callback = function()
+			pcall(function()
+				local a = n.flags["cfg_list"]
+				if a then
+					delfile("CONFIGS/" .. a .. ".cfg")
+					n:Notification("Deleted config [" .. a .. "].", 5, Color3.new(1, 0, 0))
+					e()
+				end
+			end)
+		end
+	})
+	e()
+end;
+function n:Themes(a)
+	a:dropdown({
+		name = "Theme",
+		description = "Color theme",
+		options = { "Blue", "Red", "Mono" },
+		default = "Blue",
+		flag = "theme_select",
+		callback = function(v)
+			n:LoadTheme(v)
+			-- обновляем цвет логотипа если он есть
+			if n.logo_img then
+				local theme = n.themes[n.currentTheme or "Blue"]
+				n.logo_img.ImageColor3 = theme.accent
+			end
+		end
+	})
+end;
+function n:Extra(a)
+	a:slider({
+		name = "FPS cap",
+		min = 60,
+		max = 480,
+		default = 240,
+		decimals = 0.1,
+		suffix = "FPS",
+		callback = function(a)
+			setfpscap(a)
+		end
+	})
+	a:button({
+		name = "Rejoin",
+		callback = function()
+			pcall(function()
+				game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
+			end)
+		end
+	})
+end;
+function n:Menu(a)
+	a:keybind({
+		name = "Menu Key",
+		description = "Open/Hide",
+		default = n.ui_key,
+		usekey = true,
+		ignore = true,
+		callback = function(a)
+			n.ui_key = a
+		end
+	})
+	a:toggle({
+		name = "Keybinds",
+		description = "Shows keybinds",
+		default = true,
+		flag = "show keybinds",
+		callback = function(a)
+			n.keybind_list:SetVisible(a)
+		end
+	})
+	a:dropdown({
+		name = "Menu Font",
+		description = "Custom fonts for Menu",
+		options = {
+			"Proggy",
+			"Templeos",
+			"Pixel",
+			"Rubik"
+		},
+		default = "Rubik",
+		flag = "Menu Fonts",
+		callback = function(a)
+			local b = {
+				["Proggy"] = {
+					o.proggytiny,
+					9
+				},
+				["Templeos"] = {
+					o.templeos,
+					6
+				},
+				["Pixel"] = {
+					o.smallest_pixel,
+					9
+				},
+				Rubik = {
+					Font.new([[rbxassetid://12187365977]], Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+					12
+				}
+			}
+			for d, d in ipairs({
+				n.menu_gui,
+				n.keybind_screen_gui,
+				n.noti_screen_gui
+			}) do
+				for d, d in ipairs(d:GetDescendants()) do
+					if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
+						d.FontFace, d.TextSize = table.unpack(b[a])
+					end
+				end
+			end
+		end
+	})
+end;
+return {
+	n,
+	a,
+	o,
+	q,
+	r
+}
