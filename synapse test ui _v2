@@ -123,7 +123,7 @@ function n:LoadTheme(themeName)
 	if not self.themes[themeName] then return end
 	self.currentTheme = themeName
 	local theme = self.themes[themeName]
-
+	-- переприменяем цвета ко всем зарегистрированным instance
 	for inst, data in pairs(self.instancemap) do
 		if inst and inst.Parent then
 			for prop, colorKey in pairs(data.Properties) do
@@ -925,7 +925,7 @@ do
 		n:AttachTheme(e, {
 			BackgroundColor3 = "background"
 		})
-
+		-- логотип вынесен в отдельный ScreenGui — правый верхний угол
 		do
 			local logoGui = cloneref(Instance.new("ScreenGui", gethui()))
 			logoGui.Name = "synapse_logo_gui"
@@ -1116,16 +1116,21 @@ do
 				label.TextSize            = n.font_size
 				label.AutomaticSize       = Enum.AutomaticSize.XY
 				label.Size                = UDim2.new(0, 0, 0, 0)
-
+				-- по умолчанию скрыт: показывается только когда бинд назначен
 				label.Visible = false
 
 				function api:SetVisible(v)
+					-- игнорируем внешние вызовы SetVisible(false) если бинд назначен —
+					-- видимость управляется только через Update
 				end
-
+				-- подсветка: активен → акцент, неактивен → серый
 				function api:SetActive(isActive)
 					local theme = n.themes[n.currentTheme or "Blue"]
 					label.TextColor3 = isActive and theme.accent or Color3.fromRGB(180, 180, 180)
 				end
+				-- Update вызывается при смене клавиши
+				-- keyStr = "None" или nil → скрыть строку
+				-- иначе — показать с текстом "Name: [KEY]"
 				function api:Update(keyStr, name)
 					local noKey = (keyStr == nil or keyStr == "None" or keyStr == "")
 					label.Visible = not noKey
@@ -1331,7 +1336,7 @@ do
 			BackgroundTransparency = 0;
 			BorderSizePixel = 0;
 			Position = b(0, 0, 0, 0);
-			Size = b(0, 80, 1, -10);
+			Size = b(0, 80, 1, -10);  -- <--- ИЗМЕНИТЕ 80 на комфортную для вас ширину в пикселях
 			Text = "";
 			Parent = a.window.elements.tab_holder
 		})
@@ -1495,6 +1500,7 @@ do
 		function a:Turn(d)
 			a.open = d
 			f.Visible = d
+			-- Обновляем только иконку и текст таба — без перебора всех descendants
 			n:AttachTheme(g, { ImageColor3 = d and "accent" or "inactive" })
 			n:AttachTheme(h, { TextColor3  = d and "accent" or "inactive" })
 		end;
@@ -2944,14 +2950,14 @@ do
 		q.MouseButton1Click:Connect(function()
 			if a.Binding then return end
 			r.Text = "..."
-
+			-- Пропускаем первый кадр чтобы MouseButton1 клика не попал в бинд
 			task.defer(function()
 				a.Binding = signals.connection(j.InputBegan, function(input)
-
+					-- Escape = сбросить бинд в nil
 					if input.KeyCode == Enum.KeyCode.Escape then
 						a.Binding:Disconnect()
 						a.Binding = nil
-	
+						-- сбрасываем через уже существующую функцию s
 						g = nil
 						r.Text = "None"
 						n.flags[a.Flag .. "_KEY"] = nil
@@ -3067,15 +3073,12 @@ end;
 local _guiService = cloneref(game:GetService("GuiService"))
 
 local function setMenuCursor(open)
+    if open then
+        j.MouseBehavior = Enum.MouseBehavior.Default
+        j.MouseIconEnabled = true 
+    else
 
-	_guiService.MouseIconEnabled = true
-	if open then
-
-		j.MouseBehavior = Enum.MouseBehavior.Default
-	else
-
-		j.MouseBehavior = Enum.MouseBehavior.Default
-	end
+    end
 end
 
 signals.connection(j.InputBegan, function(a)
@@ -3091,13 +3094,17 @@ signals.connection(j.InputBegan, function(a)
 	end
 end)
 
-
+-- держим курсор свободным пока меню открыто (игра может перехватывать каждый кадр)
 signals.connection(game:GetService("RunService").RenderStepped, function()
-	if n.autoload then
-		if j.MouseBehavior ~= Enum.MouseBehavior.Default then
-			j.MouseBehavior = Enum.MouseBehavior.Default
-		end
-	end
+    if n.autoload then
+        if j.MouseBehavior ~= Enum.MouseBehavior.Default then
+            j.MouseBehavior = Enum.MouseBehavior.Default
+        end
+        -- Принудительно показываем курсор, пока меню открыто
+        if not j.MouseIconEnabled then
+            j.MouseIconEnabled = true
+        end
+    end
 end)
 function n:Configs(a)
 	a:textbox({
@@ -3183,6 +3190,7 @@ function n:Themes(a)
 		flag = "theme_select",
 		callback = function(v)
 			n:LoadTheme(v)
+			-- обновляем цвет логотипа если он есть
 			if n.logo_img then
 				local theme = n.themes[n.currentTheme or "Blue"]
 				n.logo_img.ImageColor3 = theme.accent
